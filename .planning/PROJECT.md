@@ -68,6 +68,9 @@ Key workflow ideas discovered during initialization:
 - Comment drafts should be manually reviewed before posting to GitHub
 - Provider-specific AI calls should sit behind an interface so the implementation can swap OpenAI, Anthropic, or other providers later
 - v1 should prioritize bug and security review quality over breadth
+- Application architecture should follow Controller / Service / Repository layering
+- Business logic belongs in service classes
+- Database access belongs in repository classes
 
 ## Constraints
 
@@ -77,6 +80,7 @@ Key workflow ideas discovered during initialization:
 - **Security**: Do not store or log raw API secrets — GitHub tokens and AI provider keys must stay in environment/config
 - **GitHub safety**: Human approval is required before posting comments — avoids noisy or incorrect automated review comments
 - **Architecture**: AI provider must be abstracted behind an interface — prevents the core workflow from depending on one vendor
+- **Architecture**: Use Controller / Service / Repository layering — controllers handle HTTP concerns, services own business workflows, repositories own database access
 - **Scope**: Personal-use MVP first — auth, team roles, billing, and SaaS operations are deferred
 - **Testing**: External GitHub and AI calls should be faked in tests — avoids slow, brittle, or costly tests
 
@@ -91,6 +95,7 @@ Key workflow ideas discovered during initialization:
 | Generate comment drafts before posting | Keeps human control before writing to GitHub | - Pending |
 | Use simple custom instructions textarea for v1 rules | Enough configurability to validate rule usefulness without building a full rules engine | - Pending |
 | Use an AI provider interface | Keeps provider choice flexible and easier to test | - Pending |
+| Use Controller / Service / Repository architecture | Keeps HTTP handling, business workflows, and database access separated | - Pending |
 | Prioritize bug/security findings first | This is the highest-value AI review output for the MVP | - Pending |
 | Defer GitHub webhook automation | Webhook support depends on a stable manual review pipeline | - Pending |
 
