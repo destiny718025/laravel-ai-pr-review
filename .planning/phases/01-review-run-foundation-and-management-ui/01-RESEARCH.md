@@ -151,17 +151,18 @@ Deferred ideas copied from `01-CONTEXT.md`:
 
 ## Planning Implications
 
-- **01-01: Create review run data model, repository, and service boundaries** should deliver migrations/models/relationships, status handling, repository classes, parser/service result types, and tests around parser/service or persistence boundaries. It must establish Controller / Service / Repository rules before UI work depends on them. [ASSUMED]
-- **01-02: Build PR URL submission, validation, and review run creation UI** should add controller routes/views for `/` and `/reviews`, wire the form to `ReviewRunService::createFromPullRequestUrl`, display service error messages, redirect to detail on success, and assert invalid submissions create no records. [ASSUMED]
-- **01-03: Build review history/detail pages and status/failure display** should complete dashboard history, detail shell, eager-loaded identity display, status labels, failed status safe message rendering, and feature tests for listing/detail behavior. [ASSUMED]
-- Plan order matters: create schema and service contracts first, then creation UI, then richer history/detail display. Otherwise controllers will be tempted to own logic that belongs in services/repositories. [ASSUMED]
+- **01-01: Create schema, models, and status foundation** should deliver migrations, models, relationships, status handling, and schema/model tests only. It establishes the persistence foundation before parser, service, repository, or UI work depends on it. [ASSUMED]
+- **01-02: Add PR URL parser, DTOs, repositories, and review run service** should deliver parser/service result types, repository classes, `ReviewRunService::createFromPullRequestUrl`, and tests around valid creation, duplicate identity reuse, and invalid no-record behavior. [ASSUMED]
+- **01-03: Build review routes, create dashboard, and minimal detail shell** should add controller routes/views for `/` and `/reviews`, wire the form to `ReviewRunService::createFromPullRequestUrl`, display service error messages, redirect to detail on success, and assert invalid submissions create no records. [ASSUMED]
+- **01-04: Build review history/detail pages and safe status/failure display** should complete dashboard history, detail shell, eager-loaded identity display, status labels, failed status safe message rendering, the required failed-detail next-step copy, and feature tests for listing/detail behavior. [ASSUMED]
+- Plan order matters: create schema first, then service/repository contracts, then creation UI, then richer history/detail display. Otherwise controllers will be tempted to own logic that belongs in services/repositories. [ASSUMED]
 - Each plan should include tests that map directly to the required IDs: RUN-01 through RUN-07, ARCH-01 through ARCH-04, and GH-01. [VERIFIED: codebase]
 
 ## Research Provenance
 
 - Read `.planning/phases/01-review-run-foundation-and-management-ui/01-CONTEXT.md` for locked phase decisions D-01 through D-15, discretion areas, and deferred ideas. [VERIFIED: codebase]
 - Read `.planning/REQUIREMENTS.md` for Phase 1 requirement IDs RUN-01 through RUN-07, ARCH-01 through ARCH-04, and GH-01. [VERIFIED: codebase]
-- Read `.planning/ROADMAP.md` for Phase 1 goal, success criteria, and three-plan breakdown. [VERIFIED: codebase]
+- Read `.planning/ROADMAP.md` for Phase 1 goal, success criteria, and four-plan breakdown. [VERIFIED: codebase]
 - Read `.planning/STATE.md` for current phase position and planning status. [VERIFIED: codebase]
 - Read `.planning/PROJECT.md` and `AGENTS.md` for project scope, stack constraints, no-login MVP, architecture constraints, and GSD workflow guidance. [VERIFIED: codebase]
 - Read `.planning/codebase/ARCHITECTURE.md`, `.planning/codebase/STRUCTURE.md`, `.planning/codebase/CONVENTIONS.md`, and `.planning/codebase/TESTING.md` for current skeleton architecture, structure, conventions, and test setup. [VERIFIED: codebase]

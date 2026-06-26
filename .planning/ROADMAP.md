@@ -7,6 +7,7 @@ The v1 roadmap builds a vertical MVP from a usable Laravel management interface 
 ## Phases
 
 **Phase Numbering:**
+
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
@@ -19,91 +20,122 @@ The v1 roadmap builds a vertical MVP from a usable Laravel management interface 
 ## Phase Details
 
 ### Phase 1: Review Run Foundation and Management UI
+
 **Goal**: Build the first usable vertical slice: a no-login management UI that creates and displays persisted review runs.
 **Mode:** mvp
 **Depends on**: Nothing (first phase)
 **Requirements**: [RUN-01, RUN-02, RUN-03, RUN-04, RUN-05, RUN-06, RUN-07, ARCH-01, ARCH-02, ARCH-03, ARCH-04, GH-01]
 **Success Criteria** (what must be TRUE):
+
   1. User can open the management interface without logging in.
   2. User can submit a GitHub PR URL and see a persisted review run created.
   3. User can view a history page with review run status and basic PR identity.
   4. User can open a review run detail page and see safe failure/status information.
   5. Review run creation uses thin controllers, services for workflow, and repositories for database access.
-**Plans**: 3 plans
+
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: Create review run data model, repository, and service boundaries
-- [ ] 01-02: Build PR URL submission, validation, and review run creation UI
-- [ ] 01-03: Build review history/detail pages and status/failure display
+**Wave 1**
+
+- [ ] 01-01: Create schema, models, and status foundation
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 01-02: Add PR URL parser, DTOs, repositories, and review run service
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 01-03: Build review routes, create dashboard, and minimal detail shell
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 01-04: Build review history/detail pages and safe status/failure display
 
 ### Phase 2: GitHub PR Ingestion
+
 **Goal**: Fetch GitHub pull request metadata and changed file data through a fakeable GitHub client.
 **Mode:** mvp
 **Depends on**: Phase 1
 **Requirements**: [ARCH-05, GH-02, GH-03, GH-04, GH-05, GH-06]
 **Success Criteria** (what must be TRUE):
+
   1. System can fetch PR metadata and changed files through a GitHub client interface.
   2. System stores file path, line, side, and commit SHA metadata needed for future line-level comments.
   3. GitHub failures mark the review run failed with a safe summarized error.
   4. Tests fake GitHub responses and do not call the real GitHub API.
+
 **Plans**: 3 plans
 
 Plans:
+
 - [ ] 02-01: Add GitHub client interface, HTTP implementation, and fake/test fixtures
 - [ ] 02-02: Implement PR metadata/files ingestion and diff metadata persistence
 - [ ] 02-03: Add GitHub ingestion failure handling and tests
 
 ### Phase 3: Queued AI Review and Structured Findings
+
 **Goal**: Execute review work asynchronously and persist validated AI findings.
 **Mode:** mvp
 **Depends on**: Phase 2
 **Requirements**: [EXEC-01, EXEC-02, EXEC-03, EXEC-04, EXEC-05, AI-01, AI-02, AI-03, AI-04, AI-05, AI-06, AI-07, AI-08]
 **Success Criteria** (what must be TRUE):
+
   1. Submitting a review run dispatches a queued job rather than doing AI work in the HTTP request.
   2. Review execution transitions runs through in-progress, completed, and failed states.
   3. AI review runs through a provider interface with deterministic fake provider tests.
   4. Structured AI output is validated before findings are persisted.
   5. Invalid AI output fails safely without malformed findings or secret leakage.
+
 **Plans**: 4 plans
 
 Plans:
+
 - [ ] 03-01: Add review execution job and status transitions
 - [ ] 03-02: Define AI provider interface, fake provider, and structured review schema
 - [ ] 03-03: Add concrete AI provider implementation behind the interface
 - [ ] 03-04: Persist validated findings and harden failure/redaction behavior
 
 ### Phase 4: Draft Review and Custom Instructions
+
 **Goal**: Convert findings into editable comment drafts and let the user tune simple review instructions.
 **Mode:** mvp
 **Depends on**: Phase 3
 **Requirements**: [DRAFT-01, DRAFT-02, DRAFT-03, DRAFT-04, DRAFT-05, DRAFT-06, DRAFT-07, RULE-01, RULE-02, RULE-03, RULE-04]
 **Success Criteria** (what must be TRUE):
+
   1. Completed review runs show structured findings and generated comment drafts.
   2. User can edit a draft before approving it.
   3. User can approve one or more drafts without posting them automatically.
   4. Drafts track draft/approved/posted/failed state and retain GitHub targeting metadata.
   5. User can edit custom review instructions and future AI reviews include them.
+
 **Plans**: 3 plans
 
 Plans:
+
 - [ ] 04-01: Add findings/drafts repositories, models, and detail-page presentation
 - [ ] 04-02: Build draft edit and approval workflow
 - [ ] 04-03: Build custom instructions settings UI and service integration
 
 ### Phase 5: GitHub Comment Publishing
+
 **Goal**: Publish only approved comment drafts to GitHub and track the result for each draft.
 **Mode:** mvp
 **Depends on**: Phase 4
 **Requirements**: [PUB-01, PUB-02, PUB-03, PUB-04, PUB-05, PUB-06]
 **Success Criteria** (what must be TRUE):
+
   1. User can publish approved drafts to GitHub from the review detail page.
   2. Publishing uses a GitHub client interface and can be fully faked in tests.
   3. Each draft records posted or failed publication status.
   4. Failed publication shows a safe summarized error.
   5. The system never posts AI-generated comments without explicit user approval.
+
 **Plans**: 2 plans
 
 Plans:
+
 - [ ] 05-01: Implement approved-draft publication service and GitHub client write path
 - [ ] 05-02: Add publish UI, per-draft status handling, and fake GitHub publication tests
 
@@ -118,7 +150,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Review Run Foundation and Management UI | 0/3 | Not started | - |
+| 1. Review Run Foundation and Management UI | 0/4 | Not started | - |
 | 2. GitHub PR Ingestion | 0/3 | Not started | - |
 | 3. Queued AI Review and Structured Findings | 0/4 | Not started | - |
 | 4. Draft Review and Custom Instructions | 0/3 | Not started | - |
