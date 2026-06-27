@@ -11,7 +11,7 @@ Requirements for the initial personal-use MVP. Each requirement is testable and 
 
 - [ ] **RUN-01**: User can open a web management interface without logging in
 - [ ] **RUN-02**: User can submit a GitHub pull request URL from the management interface
-- [ ] **RUN-03**: System validates the submitted URL as a GitHub pull request URL before creating a review run
+- [x] **RUN-03**: System validates the submitted URL as a GitHub pull request URL before creating a review run
 - [x] **RUN-04**: System creates a persisted review run with status, source URL, repository owner/name, pull request number, and timestamps
 - [ ] **RUN-05**: User can view a review history page listing review runs with status and basic PR identity
 - [ ] **RUN-06**: User can open a review run detail page from the history page
@@ -19,15 +19,15 @@ Requirements for the initial personal-use MVP. Each requirement is testable and 
 
 ### Architecture and Persistence
 
-- [ ] **ARCH-01**: Review run workflows use Controller / Service / Repository layering
+- [x] **ARCH-01**: Review run workflows use Controller / Service / Repository layering
 - [ ] **ARCH-02**: Controllers handle HTTP validation, redirects, and view responses without owning business logic
-- [ ] **ARCH-03**: Services own business workflows for creating, executing, and publishing review runs
+- [x] **ARCH-03**: Services own business workflows for creating, executing, and publishing review runs
 - [x] **ARCH-04**: Repositories own database reads and writes for review runs, findings, drafts, and settings
 - [ ] **ARCH-05**: External GitHub and AI provider calls are hidden behind interfaces that can be faked in tests
 
 ### GitHub PR Ingestion
 
-- [ ] **GH-01**: System can parse a GitHub PR URL into owner, repository, and pull request number
+- [x] **GH-01**: System can parse a GitHub PR URL into owner, repository, and pull request number
 - [ ] **GH-02**: System can fetch pull request metadata from GitHub through a GitHub client interface
 - [ ] **GH-03**: System can fetch pull request changed files and patch data through a GitHub client interface
 - [ ] **GH-04**: System stores enough diff metadata to later publish line-level comments, including file path, line, side, and commit SHA when available
@@ -135,17 +135,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | RUN-01 | Phase 1 | Pending |
 | RUN-02 | Phase 1 | Pending |
-| RUN-03 | Phase 1 | Pending |
+| RUN-03 | Phase 1 | Complete |
 | RUN-04 | Phase 1 | Complete |
 | RUN-05 | Phase 1 | Pending |
 | RUN-06 | Phase 1 | Pending |
 | RUN-07 | Phase 1 | Pending |
-| ARCH-01 | Phase 1 | Pending |
+| ARCH-01 | Phase 1 | Complete |
 | ARCH-02 | Phase 1 | Pending |
-| ARCH-03 | Phase 1 | Pending |
+| ARCH-03 | Phase 1 | Complete |
 | ARCH-04 | Phase 1 | Complete |
 | ARCH-05 | Phase 2 | Pending |
-| GH-01 | Phase 1 | Pending |
+| GH-01 | Phase 1 | Complete |
 | GH-02 | Phase 2 | Pending |
 | GH-03 | Phase 2 | Pending |
 | GH-04 | Phase 2 | Pending |
