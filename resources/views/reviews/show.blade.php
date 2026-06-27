@@ -43,6 +43,11 @@
 
     <section class="section">
         <h2>Pull Request</h2>
+        <form method="POST" action="{{ route('reviews.fetch', $reviewRun) }}" style="margin-bottom: 20px;">
+            @csrf
+            <button type="submit">Fetch</button>
+        </form>
+
         <div class="metadata">
             <div class="metadata-row">
                 <span class="meta-label">Repository</span>
@@ -60,6 +65,46 @@
             </div>
         </div>
     </section>
+
+    @if ($reviewRun->github_fetched_at)
+        <section class="section">
+            <h2>GitHub Snapshot</h2>
+            <div class="metadata">
+                <div class="metadata-row">
+                    <span class="meta-label">Title</span>
+                    <span>{{ $reviewRun->github_title }}</span>
+                </div>
+                <div class="metadata-row">
+                    <span class="meta-label">State</span>
+                    <span>{{ $reviewRun->github_state }}</span>
+                </div>
+                <div class="metadata-row">
+                    <span class="meta-label">Head SHA</span>
+                    <span>{{ $reviewRun->github_head_sha }}</span>
+                </div>
+                <div class="metadata-row">
+                    <span class="meta-label">Fetched</span>
+                    <span>{{ $reviewRun->github_fetched_at->format('Y-m-d H:i') }}</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Fetched Files</h2>
+            @if ($reviewRun->files->isEmpty())
+                <p class="muted">No changed files were returned by GitHub.</p>
+            @else
+                <div class="metadata">
+                    @foreach ($reviewRun->files as $file)
+                        <div class="metadata-row">
+                            <span class="meta-label">{{ $file->filename }}</span>
+                            <span>{{ $file->sha }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </section>
+    @endif
 
     <section class="section">
         <h2>Run Metadata</h2>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\ReviewRunRepository;
+use App\Services\PullRequestIngestionService;
 use App\Services\ReviewRunService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,5 +44,14 @@ class ReviewController extends Controller
         return view('reviews.show', [
             'reviewRun' => $reviewRunRepository->findWithPullRequestRepositoryOrFail($reviewRun),
         ]);
+    }
+
+    public function fetch(int|string $reviewRun, PullRequestIngestionService $pullRequestIngestionService): RedirectResponse
+    {
+        $result = $pullRequestIngestionService->fetch($reviewRun);
+
+        return redirect()
+            ->route('reviews.show', $result->reviewRun())
+            ->with('status', $result->message());
     }
 }
