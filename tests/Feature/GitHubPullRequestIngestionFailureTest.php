@@ -106,6 +106,49 @@ class GitHubPullRequestIngestionFailureTest extends TestCase
         $this->assertFailedSafely($reviewRun, 'GitHub returned an unexpected response. Try again later.');
     }
 
+    public function test_successful_retry_clears_prior_github_failure_state(): void
+    {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://api.github.com/repos/laravel/framework/pulls/1' => Http::sequence()
+                ->push(['message' => 'Not Found: raw upstream body'], 404)
+                ->push($this->fixture('GitHub/pull-request.json'), 200),
+            'https://api.github.com/repos/laravel/framework/pulls/1/files?per_page=100&page=1' => Http::response(
+                $this->fixture('GitHub/pull-request-files-page-1.json'),
+                200,
+                [
+                    'Content-Type' => 'application/json',
+                    'Link' => '<https://api.github.com/repos/laravel/framework/pulls/1/files?per_page=100&page=2>; rel="next", <https://api.github.com/repos/laravel/framework/pulls/1/files?per_page=100&page=2>; rel="last"',
+                ],
+            ),
+            'https://api.github.com/repos/laravel/framework/pulls/1/files?per_page=100&page=2' => Http::response(
+                $this->fixture('GitHub/pull-request-files-page-2.json'),
+                200,
+                ['Content-Type' => 'application/json'],
+            ),
+        ]);
+
+        $reviewRun = $this->createReviewRun();
+
+        $this->post(route('reviews.fetch', $reviewRun))
+            ->assertRedirect(route('reviews.show', $reviewRun))
+            ->assertSessionHas('service_error_code', 'not_found_or_unreadable');
+
+        $this->assertFailedSafely($reviewRun, 'GitHub could not find or read this pull request.');
+
+        $this->post(route('reviews.fetch', $reviewRun))
+            ->assertRedirect(route('reviews.show', $reviewRun))
+            ->assertSessionHas('status', 'GitHub pull request data fetched.');
+
+        $reviewRun = ReviewRun::query()->with('files')->findOrFail($reviewRun->id);
+
+        $this->assertSame(ReviewRunStatus::Pending, $reviewRun->status);
+        $this->assertNull($reviewRun->safe_error_message);
+        $this->assertNull($reviewRun->failed_at);
+        $this->assertSame('Add fixture-driven GitHub ingestion boundary', $reviewRun->github_title);
+        $this->assertCount(3, $reviewRun->files);
+    }
+
     private function createReviewRun(): ReviewRun
     {
         return app(ReviewRunService::class)
@@ -134,5 +177,10 @@ class GitHubPullRequestIngestionFailureTest extends TestCase
         foreach ($unsafeFragments as $fragment) {
             $this->assertStringNotContainsString($fragment, (string) $reviewRun->safe_error_message);
         }
+    }
+
+    private function fixture(string $path): string
+    {
+        return (string) file_get_contents(base_path('tests/Fixtures/'.$path));
     }
 }

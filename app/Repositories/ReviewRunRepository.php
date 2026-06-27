@@ -46,11 +46,13 @@ class ReviewRunRepository
     {
         return DB::transaction(function () use ($reviewRun, $snapshot, $files): ReviewRun {
             $reviewRun->forceFill([
+                'status' => ReviewRunStatus::Pending,
                 'github_title' => $snapshot->title,
                 'github_state' => $snapshot->state,
                 'github_head_sha' => $snapshot->headSha,
                 'github_fetched_at' => now(),
                 'safe_error_message' => null,
+                'failed_at' => null,
             ])->save();
 
             $reviewRun->files()->delete();
