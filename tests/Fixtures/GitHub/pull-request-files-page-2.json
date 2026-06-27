@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "3333333333333333333333333333333333333333",
+    "filename": "tests/Feature/GitHubPullRequestIngestionTest.php",
+    "status": "modified",
+    "additions": 24,
+    "deletions": 2,
+    "changes": 26,
+    "blob_url": "https://github.com/laravel/framework/blob/abc123def4567890abc123def4567890abc12345/tests/Feature/GitHubPullRequestIngestionTest.php",
+    "raw_url": "https://github.com/laravel/framework/raw/abc123def4567890abc123def4567890abc12345/tests/Feature/GitHubPullRequestIngestionTest.php",
+    "contents_url": "https://api.github.com/repos/laravel/framework/contents/tests/Feature/GitHubPullRequestIngestionTest.php?ref=abc123def4567890abc123def4567890abc12345",
+    "patch": "@@ -12,6 +12,10 @@ class GitHubPullRequestIngestionTest extends TestCase\n+    public function test_client_paginates_pull_request_files_from_fixture_pages_without_live_requests(): void\n+    {\n+        $this->assertTrue(true);\n+    }\n"
+  }
+]

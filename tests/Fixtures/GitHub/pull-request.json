@@ -1,0 +1,16 @@
+{
+  "id": 123456789,
+  "number": 1,
+  "state": "open",
+  "title": "Add fixture-driven GitHub ingestion boundary",
+  "body": "This fixture mirrors the GitHub pull request metadata shape used by the ingestion client.",
+  "head": {
+    "sha": "abc123def4567890abc123def4567890abc12345",
+    "ref": "feature/github-client"
+  },
+  "base": {
+    "sha": "fedcba9876543210fedcba9876543210fedcba98",
+    "ref": "main"
+  },
+  "html_url": "https://github.com/laravel/framework/pull/1"
+}
