@@ -52,9 +52,43 @@
     <section class="section" aria-labelledby="recent-review-runs-title">
         <h2 id="recent-review-runs-title">Recent Review Runs</h2>
 
-        <div class="empty-state">
-            <strong>No review runs yet</strong>
-            <span>Paste a GitHub pull request URL above to create your first review run.</span>
-        </div>
+        @if ($reviewRuns->isEmpty())
+            <div class="empty-state">
+                <strong>No review runs yet</strong>
+                <span>Paste a GitHub pull request URL above to create your first review run.</span>
+            </div>
+        @else
+            <div class="review-list">
+                @foreach ($reviewRuns as $reviewRun)
+                    <article class="review-row">
+                        <div class="review-row-status">
+                            <x-review-status :status="$reviewRun->status" />
+                        </div>
+
+                        <div class="review-row-main">
+                            <div class="review-row-title">
+                                <strong>{{ $reviewRun->pullRequest->repository->full_name }}</strong>
+                                <span>PR #{{ $reviewRun->pullRequest->number }}</span>
+                            </div>
+
+                            <a href="{{ $reviewRun->pullRequest->source_url }}" target="_blank" rel="noreferrer">
+                                {{ $reviewRun->pullRequest->source_url }}
+                            </a>
+
+                            @if ($reviewRun->status === \App\Enums\ReviewRunStatus::Failed)
+                                <p class="helper">
+                                    {{ $reviewRun->safe_error_message ?: 'The run failed, but no safe error summary was recorded.' }}
+                                </p>
+                            @endif
+                        </div>
+
+                        <div class="review-row-meta">
+                            <span class="muted">{{ $reviewRun->created_at->format('Y-m-d H:i') }}</span>
+                            <a href="{{ route('reviews.show', $reviewRun) }}">View review run</a>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+        @endif
     </section>
 @endsection

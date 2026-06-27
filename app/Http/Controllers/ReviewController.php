@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ReviewRun;
+use App\Repositories\ReviewRunRepository;
 use App\Services\ReviewRunService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -10,9 +10,11 @@ use Illuminate\View\View;
 
 class ReviewController extends Controller
 {
-    public function index(): View
+    public function index(ReviewRunRepository $reviewRunRepository): View
     {
-        return view('reviews.index');
+        return view('reviews.index', [
+            'reviewRuns' => $reviewRunRepository->recentWithPullRequestRepository(),
+        ]);
     }
 
     public function store(Request $request, ReviewRunService $reviewRunService): RedirectResponse
@@ -36,10 +38,10 @@ class ReviewController extends Controller
             ->with('status', $result->message());
     }
 
-    public function show(ReviewRun $reviewRun): View
+    public function show(int|string $reviewRun, ReviewRunRepository $reviewRunRepository): View
     {
         return view('reviews.show', [
-            'reviewRun' => $reviewRun->load('pullRequest.repository'),
+            'reviewRun' => $reviewRunRepository->findWithPullRequestRepositoryOrFail($reviewRun),
         ]);
     }
 }

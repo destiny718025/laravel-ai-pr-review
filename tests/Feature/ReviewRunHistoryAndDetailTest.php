@@ -21,8 +21,8 @@ class ReviewRunHistoryAndDetailTest extends TestCase
         $older = $service->createFromPullRequestUrl('https://github.com/old/repo/pull/10')->reviewRun();
         $newer = $service->createFromPullRequestUrl('https://github.com/new/repo/pull/20')->reviewRun();
 
-        $older->update(['created_at' => now()->subMinute()]);
-        $newer->update(['created_at' => now()]);
+        $older->forceFill(['created_at' => now()->subMinute()])->save();
+        $newer->forceFill(['created_at' => now()])->save();
 
         $response = $this->get('/reviews')
             ->assertOk()
