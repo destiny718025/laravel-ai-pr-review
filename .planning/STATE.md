@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 1
-current_phase_name: Review Run Foundation and Management UI
-status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-06-27T03:44:27.000Z"
+current_phase: 2
+current_phase_name: GitHub PR Ingestion
+status: discussing
+stopped_at: Phase 2 context gathered
+last_updated: "2026-06-27T04:21:15.000Z"
 last_activity: 2026-06-27
-last_activity_desc: Completed Phase 1 Plan 01-04 review run history and detail UI
+last_activity_desc: Gathered Phase 2 GitHub PR ingestion context
 progress:
   total_phases: 5
-  completed_phases: 0
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  completed_phases: 1
+  total_plans: 3
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-26)
 
 **Core value:** Turn a GitHub PR URL into useful, reviewable AI findings and comment drafts that help catch bugs and security issues before code is merged.
-**Current focus:** Phase 1: Review Run Foundation and Management UI
+**Current focus:** Phase 2: GitHub PR Ingestion
 
 ## Current Position
 
-Phase: 1 of 5 (Review Run Foundation and Management UI)
-Plan: 4 of 4 in current phase
-Status: Executing - 01-04 complete, Phase 1 ready for milestone audit
-Last activity: 2026-06-27 — Completed Phase 1 Plan 01-04 review run history and detail UI
+Phase: 2 of 5 (GitHub PR Ingestion)
+Plan: 0 of 3 in current phase
+Status: Discussing - Phase 2 context gathered, ready for planning
+Last activity: 2026-06-27 — Gathered Phase 2 GitHub PR ingestion context
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -52,7 +52,7 @@ Progress: [██████████] 100%
 **Recent Trend:**
 
 - Last 5 plans: 01-01, 01-02, 01-03, 01-04
-- Trend: Phase 1 local review run workflow is complete
+- Trend: Phase 1 complete; Phase 2 context is ready for planning
 
 ## Accumulated Context
 
@@ -75,7 +75,8 @@ None yet.
 
 - AI provider choice remains open until implementation planning
 - Private repo auth model should start simple and be revisited before webhook/team work
-- GitHub diff-to-comment mapping needs focused tests before publishing comments
+- GitHub ingestion starts public-only and needs focused fake-client tests before any real API dependency
+- GitHub diff-to-comment mapping is deferred beyond Phase 2; Phase 2 stores filename, patch, and sha only
 
 ## Deferred Items
 
@@ -88,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-27T03:31:12.522Z
-Stopped at: Completed 01-03-PLAN.md
-Resume file: None
+Last session: 2026-06-27T04:21:15.000Z
+Stopped at: Phase 2 context gathered
+Resume file: .planning/phases/02-github-pr-ingestion/02-CONTEXT.md

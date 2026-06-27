@@ -13,9 +13,9 @@ Requirements for the initial personal-use MVP. Each requirement is testable and 
 - [x] **RUN-02**: User can submit a GitHub pull request URL from the management interface
 - [x] **RUN-03**: System validates the submitted URL as a GitHub pull request URL before creating a review run
 - [x] **RUN-04**: System creates a persisted review run with status, source URL, repository owner/name, pull request number, and timestamps
-- [ ] **RUN-05**: User can view a review history page listing review runs with status and basic PR identity
-- [ ] **RUN-06**: User can open a review run detail page from the history page
-- [ ] **RUN-07**: User can see review run failure status and a safe summarized error message when a run fails
+- [x] **RUN-05**: User can view a review history page listing review runs with status and basic PR identity
+- [x] **RUN-06**: User can open a review run detail page from the history page
+- [x] **RUN-07**: User can see review run failure status and a safe summarized error message when a run fails
 
 ### Architecture and Persistence
 
@@ -137,9 +137,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RUN-02 | Phase 1 | Complete |
 | RUN-03 | Phase 1 | Complete |
 | RUN-04 | Phase 1 | Complete |
-| RUN-05 | Phase 1 | Pending |
-| RUN-06 | Phase 1 | Pending |
-| RUN-07 | Phase 1 | Pending |
+| RUN-05 | Phase 1 | Complete |
+| RUN-06 | Phase 1 | Complete |
+| RUN-07 | Phase 1 | Complete |
 | ARCH-01 | Phase 1 | Complete |
 | ARCH-02 | Phase 1 | Complete |
 | ARCH-03 | Phase 1 | Complete |

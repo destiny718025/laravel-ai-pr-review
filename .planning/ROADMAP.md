@@ -11,7 +11,7 @@ The v1 roadmap builds a vertical MVP from a usable Laravel management interface 
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Review Run Foundation and Management UI** - User can submit PR URLs and see persisted review run status/history
+- [x] **Phase 1: Review Run Foundation and Management UI** - User can submit PR URLs and see persisted review run status/history
 - [ ] **Phase 2: GitHub PR Ingestion** - System fetches PR metadata/files and stores comment-targeting diff metadata
 - [ ] **Phase 3: Queued AI Review and Structured Findings** - System executes review jobs through an AI provider interface and persists validated findings
 - [ ] **Phase 4: Draft Review and Custom Instructions** - User can inspect findings, edit drafts, approve drafts, and tune simple instructions
@@ -33,14 +33,14 @@ The v1 roadmap builds a vertical MVP from a usable Laravel management interface 
   4. User can open a review run detail page and see safe failure/status information.
   5. Review run creation uses thin controllers, services for workflow, and repositories for database access.
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans executed
 
 Plans:
 
 - [x] 01-01-PLAN.md
 - [x] 01-02-PLAN.md
 - [x] 01-03-PLAN.md
-- [ ] 01-04-PLAN.md
+- [x] 01-04-PLAN.md
 
 **Wave 1**
 
@@ -56,7 +56,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 01-04: Build review history/detail pages and safe status/failure display
+- [x] 01-04: Build review history/detail pages and safe status/failure display
 
 ### Phase 2: GitHub PR Ingestion
 
@@ -156,7 +156,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Review Run Foundation and Management UI | 3/4 | In Progress | - |
+| 1. Review Run Foundation and Management UI | 4/4 | Complete | 2026-06-27 |
 | 2. GitHub PR Ingestion | 0/3 | Not started | - |
 | 3. Queued AI Review and Structured Findings | 0/4 | Not started | - |
 | 4. Draft Review and Custom Instructions | 0/3 | Not started | - |
