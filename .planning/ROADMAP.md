@@ -74,9 +74,16 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
+**Wave 1**
 
 - [ ] 02-01: Add GitHub client interface, HTTP implementation, and fake/test fixtures
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 02-02: Implement PR metadata/files ingestion and diff metadata persistence
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 02-03: Add GitHub ingestion failure handling and tests
 
 ### Phase 3: Queued AI Review and Structured Findings
