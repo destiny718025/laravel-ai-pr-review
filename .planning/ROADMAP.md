@@ -33,13 +33,13 @@ The v1 roadmap builds a vertical MVP from a usable Laravel management interface 
   4. User can open a review run detail page and see safe failure/status information.
   5. Review run creation uses thin controllers, services for workflow, and repositories for database access.
 
-**Plans**: 2/4 plans executed
+**Plans**: 3/4 plans executed
 
 Plans:
 
 - [x] 01-01-PLAN.md
 - [x] 01-02-PLAN.md
-- [ ] 01-03-PLAN.md
+- [x] 01-03-PLAN.md
 - [ ] 01-04-PLAN.md
 
 **Wave 1**
@@ -52,7 +52,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-03: Build review routes, create dashboard, and minimal detail shell
+- [x] 01-03: Build review routes, create dashboard, and minimal detail shell
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -156,7 +156,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Review Run Foundation and Management UI | 2/4 | In Progress | - |
+| 1. Review Run Foundation and Management UI | 3/4 | In Progress | - |
 | 2. GitHub PR Ingestion | 0/3 | Not started | - |
 | 3. Queued AI Review and Structured Findings | 0/4 | Not started | - |
 | 4. Draft Review and Custom Instructions | 0/3 | Not started | - |
