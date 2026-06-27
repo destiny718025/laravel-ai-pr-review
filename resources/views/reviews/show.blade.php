@@ -28,6 +28,12 @@
         </div>
     @endif
 
+    @if (session('service_error_message'))
+        <div class="error-block" style="margin-bottom: 24px;">
+            <strong>{{ session('service_error_message') }}</strong>
+        </div>
+    @endif
+
     <section class="section">
         <h2>Status</h2>
         @if ($reviewRun->status === \App\Enums\ReviewRunStatus::Failed)

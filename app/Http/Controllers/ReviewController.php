@@ -50,6 +50,13 @@ class ReviewController extends Controller
     {
         $result = $pullRequestIngestionService->fetch($reviewRun);
 
+        if (! $result->successful()) {
+            return redirect()
+                ->route('reviews.show', $result->reviewRun())
+                ->with('service_error_code', $result->errorCode())
+                ->with('service_error_message', $result->message());
+        }
+
         return redirect()
             ->route('reviews.show', $result->reviewRun())
             ->with('status', $result->message());

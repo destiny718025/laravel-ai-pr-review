@@ -66,4 +66,15 @@ class ReviewRunRepository
             return $reviewRun->refresh()->load(['files', 'pullRequest.repository']);
         });
     }
+
+    public function markGitHubFetchFailed(ReviewRun $reviewRun, string $safeErrorMessage): ReviewRun
+    {
+        $reviewRun->forceFill([
+            'status' => ReviewRunStatus::Failed,
+            'safe_error_message' => $safeErrorMessage,
+            'failed_at' => now(),
+        ])->save();
+
+        return $reviewRun->refresh()->load(['files', 'pullRequest.repository']);
+    }
 }

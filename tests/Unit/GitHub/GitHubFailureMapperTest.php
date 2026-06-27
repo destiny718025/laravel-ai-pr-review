@@ -6,7 +6,7 @@ use App\Services\GitHub\GitHubFailureMapper;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Psr7\Response as PsrResponse;
 use Tests\TestCase;
 
 class GitHubFailureMapperTest extends TestCase
@@ -58,7 +58,11 @@ class GitHubFailureMapperTest extends TestCase
      */
     private function requestException(int $status, array $headers = []): RequestException
     {
-        $response = new Response(Http::response(['message' => 'raw upstream body'], $status, $headers));
+        $response = new Response(new PsrResponse(
+            $status,
+            $headers,
+            json_encode(['message' => 'raw upstream body'], JSON_THROW_ON_ERROR),
+        ));
 
         return new RequestException($response);
     }
