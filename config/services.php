@@ -22,6 +22,12 @@ return [
         'key' => env('RESEND_API_KEY'),
     ],
 
+    'github' => [
+        'base_url' => env('GITHUB_API_BASE_URL', 'https://api.github.com'),
+        'api_version' => env('GITHUB_API_VERSION', '2022-11-28'),
+        'token' => env('GITHUB_TOKEN'),
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
