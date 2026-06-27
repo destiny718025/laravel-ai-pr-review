@@ -12,7 +12,7 @@ Requirements for the initial personal-use MVP. Each requirement is testable and 
 - [ ] **RUN-01**: User can open a web management interface without logging in
 - [ ] **RUN-02**: User can submit a GitHub pull request URL from the management interface
 - [ ] **RUN-03**: System validates the submitted URL as a GitHub pull request URL before creating a review run
-- [ ] **RUN-04**: System creates a persisted review run with status, source URL, repository owner/name, pull request number, and timestamps
+- [x] **RUN-04**: System creates a persisted review run with status, source URL, repository owner/name, pull request number, and timestamps
 - [ ] **RUN-05**: User can view a review history page listing review runs with status and basic PR identity
 - [ ] **RUN-06**: User can open a review run detail page from the history page
 - [ ] **RUN-07**: User can see review run failure status and a safe summarized error message when a run fails
@@ -22,7 +22,7 @@ Requirements for the initial personal-use MVP. Each requirement is testable and 
 - [ ] **ARCH-01**: Review run workflows use Controller / Service / Repository layering
 - [ ] **ARCH-02**: Controllers handle HTTP validation, redirects, and view responses without owning business logic
 - [ ] **ARCH-03**: Services own business workflows for creating, executing, and publishing review runs
-- [ ] **ARCH-04**: Repositories own database reads and writes for review runs, findings, drafts, and settings
+- [x] **ARCH-04**: Repositories own database reads and writes for review runs, findings, drafts, and settings
 - [ ] **ARCH-05**: External GitHub and AI provider calls are hidden behind interfaces that can be faked in tests
 
 ### GitHub PR Ingestion
@@ -136,14 +136,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RUN-01 | Phase 1 | Pending |
 | RUN-02 | Phase 1 | Pending |
 | RUN-03 | Phase 1 | Pending |
-| RUN-04 | Phase 1 | Pending |
+| RUN-04 | Phase 1 | Complete |
 | RUN-05 | Phase 1 | Pending |
 | RUN-06 | Phase 1 | Pending |
 | RUN-07 | Phase 1 | Pending |
 | ARCH-01 | Phase 1 | Pending |
 | ARCH-02 | Phase 1 | Pending |
 | ARCH-03 | Phase 1 | Pending |
-| ARCH-04 | Phase 1 | Pending |
+| ARCH-04 | Phase 1 | Complete |
 | ARCH-05 | Phase 2 | Pending |
 | GH-01 | Phase 1 | Pending |
 | GH-02 | Phase 2 | Pending |
@@ -183,6 +183,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PUB-06 | Phase 5 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 48 total
 - Mapped to phases: 48
 - Unmapped: 0
