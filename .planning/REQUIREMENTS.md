@@ -23,16 +23,16 @@ Requirements for the initial personal-use MVP. Each requirement is testable and 
 - [x] **ARCH-02**: Controllers handle HTTP validation, redirects, and view responses without owning business logic
 - [x] **ARCH-03**: Services own business workflows for creating, executing, and publishing review runs
 - [x] **ARCH-04**: Repositories own database reads and writes for review runs, findings, drafts, and settings
-- [ ] **ARCH-05**: External GitHub and AI provider calls are hidden behind interfaces that can be faked in tests
+- [x] **ARCH-05**: External GitHub and AI provider calls are hidden behind interfaces that can be faked in tests
 
 ### GitHub PR Ingestion
 
 - [x] **GH-01**: System can parse a GitHub PR URL into owner, repository, and pull request number
-- [ ] **GH-02**: System can fetch pull request metadata from GitHub through a GitHub client interface
-- [ ] **GH-03**: System can fetch pull request changed files and patch data through a GitHub client interface
-- [ ] **GH-04**: System stores enough diff metadata to later publish line-level comments, including file path, line, side, and commit SHA when available
-- [ ] **GH-05**: System records a clear failure state when GitHub API calls fail or the PR cannot be read
-- [ ] **GH-06**: Tests can fake GitHub API responses without calling the real GitHub API
+- [x] **GH-02**: System can fetch pull request metadata from GitHub through a GitHub client interface
+- [x] **GH-03**: System can fetch pull request changed files and patch data through a GitHub client interface
+- [x] **GH-04**: System stores replayable diff snapshot data for later line-level comments, including filename, patch, file SHA, and PR head SHA
+- [x] **GH-05**: System records a clear failure state when GitHub API calls fail or the PR cannot be read
+- [x] **GH-06**: Tests can fake GitHub API responses without calling the real GitHub API
 
 ### Review Execution
 
@@ -144,13 +144,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ARCH-02 | Phase 1 | Complete |
 | ARCH-03 | Phase 1 | Complete |
 | ARCH-04 | Phase 1 | Complete |
-| ARCH-05 | Phase 2 | Pending |
+| ARCH-05 | Phase 2 | Complete |
 | GH-01 | Phase 1 | Complete |
-| GH-02 | Phase 2 | Pending |
-| GH-03 | Phase 2 | Pending |
-| GH-04 | Phase 2 | Pending |
-| GH-05 | Phase 2 | Pending |
-| GH-06 | Phase 2 | Pending |
+| GH-02 | Phase 2 | Complete |
+| GH-03 | Phase 2 | Complete |
+| GH-04 | Phase 2 | Complete |
+| GH-05 | Phase 2 | Complete |
+| GH-06 | Phase 2 | Complete |
 | EXEC-01 | Phase 3 | Pending |
 | EXEC-02 | Phase 3 | Pending |
 | EXEC-03 | Phase 3 | Pending |
