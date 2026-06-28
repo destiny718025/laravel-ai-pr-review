@@ -1,0 +1,13 @@
+{
+  "findings": [
+    {
+      "severity": "urgent",
+      "category": "unknown",
+      "file_path": "app/Services/GitHub/HttpGitHubClient.php",
+      "title": "Invalid finding shape",
+      "rationale": "This fixture intentionally violates the Phase 3 schema.",
+      "suggested_comment_text": "This should never be persisted."
+    }
+  ],
+  "raw_provider_payload": "secret fragment"
+}

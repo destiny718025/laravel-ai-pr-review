@@ -40,7 +40,7 @@
             <div class="error-block" style="margin-top: 0;">
                 <strong>Review run failed</strong>
                 <div>{{ $reviewRun->safe_error_message ?: 'The run failed, but no safe error summary was recorded.' }}</div>
-                <div>Review the safe error summary, then create a new run after fixing the source issue.</div>
+                <div>Review the safe error summary, then run AI review again after fixing the source issue.</div>
             </div>
         @else
             <p class="muted">This review run is ready for the next processing step.</p>
@@ -53,6 +53,15 @@
             @csrf
             <button type="submit">Fetch</button>
         </form>
+
+        @if ($reviewRun->github_fetched_at)
+            <form method="POST" action="{{ route('reviews.run', $reviewRun) }}" style="margin-bottom: 20px;">
+                @csrf
+                <button type="submit">Run AI Review</button>
+            </form>
+        @else
+            <p class="muted">Fetch GitHub pull request data before running AI review.</p>
+        @endif
 
         <div class="metadata">
             <div class="metadata-row">
@@ -105,6 +114,27 @@
                         <div class="metadata-row">
                             <span class="meta-label">{{ $file->filename }}</span>
                             <span>{{ $file->sha }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </section>
+
+        <section class="section">
+            <h2>Structured Findings</h2>
+            @if ($reviewRun->findings->isEmpty())
+                <p class="muted">No AI review findings have been persisted for this run.</p>
+            @else
+                <div class="metadata">
+                    @foreach ($reviewRun->findings as $finding)
+                        <div class="metadata-row">
+                            <span class="meta-label">{{ str($finding->severity)->title() }} {{ str($finding->category)->title() }}</span>
+                            <span>
+                                <strong>{{ $finding->title }}</strong><br>
+                                {{ $finding->file_path }}@if ($finding->line_reference):{{ $finding->line_reference }}@endif<br>
+                                {{ $finding->rationale }}<br>
+                                Suggested comment: {{ $finding->suggested_comment_text }}
+                            </span>
                         </div>
                     @endforeach
                 </div>

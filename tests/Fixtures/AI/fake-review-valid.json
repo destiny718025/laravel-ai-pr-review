@@ -1,0 +1,22 @@
+{
+  "findings": [
+    {
+      "severity": "high",
+      "category": "bug",
+      "file_path": "app/Services/GitHub/HttpGitHubClient.php",
+      "line_reference": "24",
+      "title": "Unhandled malformed upstream payload",
+      "rationale": "The code assumes the provider response shape is valid before validation, which can produce runtime failures during review execution.",
+      "suggested_comment_text": "Please validate the provider response shape before consuming nested fields so malformed responses fail safely."
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "file_path": "app/Contracts/GitHub/GitHubClient.php",
+      "line_reference": null,
+      "title": "Keep provider errors sanitized",
+      "rationale": "Provider failures may contain authorization headers or API keys if raw exception messages are persisted.",
+      "suggested_comment_text": "Please map provider exceptions to safe summaries before storing or rendering them."
+    }
+  ]
+}

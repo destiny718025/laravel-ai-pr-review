@@ -100,14 +100,32 @@ Plans:
   4. Structured AI output is validated before findings are persisted.
   5. Invalid AI output fails safely without malformed findings or secret leakage.
 
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
 
-- [ ] 03-01: Add review execution job and status transitions
-- [ ] 03-02: Define AI provider interface, fake provider, and structured review schema
-- [ ] 03-03: Add concrete AI provider implementation behind the interface
-- [ ] 03-04: Persist validated findings and harden failure/redaction behavior
+- [x] 03-01-PLAN.md — Add manual run action, queued dispatch, and lifecycle status transitions
+- [x] 03-02-PLAN.md — Add fake-first AI provider contract, request DTO, fixtures, and default instructions
+- [x] 03-03-PLAN.md — Add structured output validation, failure mapping, and execution-service safety wiring
+- [x] 03-04-PLAN.md — Add the opt-in OpenAI adapter seam behind the provider interface
+- [x] 03-05-PLAN.md — Persist validated findings, render them on the detail page, and harden retry/failure behavior
+
+**Wave 1**
+
+- [x] 03-01: Add manual run action, queued dispatch, and lifecycle status transitions
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 03-02: Add fake-first AI provider contract, request DTO, fixtures, and default instructions
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [x] 03-03: Add structured output validation, failure mapping, and execution-service safety wiring
+- [x] 03-04: Add the opt-in OpenAI adapter seam behind the provider interface
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [x] 03-05: Persist validated findings, render them on the detail page, and harden retry/failure behavior
 
 ### Phase 4: Draft Review and Custom Instructions
 
@@ -165,6 +183,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Review Run Foundation and Management UI | 4/4 | Complete | 2026-06-27 |
 | 2. GitHub PR Ingestion | 3/3 | Complete    | 2026-06-27 |
-| 3. Queued AI Review and Structured Findings | 0/4 | Not started | - |
+| 3. Queued AI Review and Structured Findings | 5/5 | Ready for verification | - |
 | 4. Draft Review and Custom Instructions | 0/3 | Not started | - |
 | 5. GitHub Comment Publishing | 0/2 | Not started | - |

@@ -35,7 +35,7 @@ class ReviewRunRepository
     public function findWithPullRequestRepositoryOrFail(int|string $id): ReviewRun
     {
         return ReviewRun::query()
-            ->with(['files', 'pullRequest.repository'])
+            ->with(['files', 'findings', 'pullRequest.repository'])
             ->findOrFail($id);
     }
 
@@ -65,7 +65,7 @@ class ReviewRunRepository
                 ]);
             }
 
-            return $reviewRun->refresh()->load(['files', 'pullRequest.repository']);
+            return $reviewRun->refresh()->load(['files', 'findings', 'pullRequest.repository']);
         });
     }
 
@@ -77,6 +77,58 @@ class ReviewRunRepository
             'failed_at' => now(),
         ])->save();
 
-        return $reviewRun->refresh()->load(['files', 'pullRequest.repository']);
+        return $reviewRun->refresh()->load(['files', 'findings', 'pullRequest.repository']);
+    }
+
+    public function queueForExecution(ReviewRun $reviewRun): ReviewRun
+    {
+        $reviewRun->forceFill([
+            'status' => ReviewRunStatus::Queued,
+            'queued_at' => now(),
+            'started_at' => null,
+            'completed_at' => null,
+            'safe_error_message' => null,
+            'failed_at' => null,
+            'cancelled_at' => null,
+        ])->save();
+
+        return $reviewRun->refresh()->load(['files', 'findings', 'pullRequest.repository']);
+    }
+
+    public function markRunning(ReviewRun $reviewRun): ReviewRun
+    {
+        $reviewRun->forceFill([
+            'status' => ReviewRunStatus::Running,
+            'started_at' => now(),
+            'completed_at' => null,
+            'safe_error_message' => null,
+            'failed_at' => null,
+        ])->save();
+
+        return $reviewRun->refresh()->load(['files', 'findings', 'pullRequest.repository']);
+    }
+
+    public function markCompleted(ReviewRun $reviewRun): ReviewRun
+    {
+        $reviewRun->forceFill([
+            'status' => ReviewRunStatus::Completed,
+            'completed_at' => now(),
+            'safe_error_message' => null,
+            'failed_at' => null,
+        ])->save();
+
+        return $reviewRun->refresh()->load(['files', 'findings', 'pullRequest.repository']);
+    }
+
+    public function markExecutionFailed(ReviewRun $reviewRun, string $safeErrorMessage): ReviewRun
+    {
+        $reviewRun->forceFill([
+            'status' => ReviewRunStatus::Failed,
+            'safe_error_message' => $safeErrorMessage,
+            'failed_at' => now(),
+            'completed_at' => null,
+        ])->save();
+
+        return $reviewRun->refresh()->load(['files', 'findings', 'pullRequest.repository']);
     }
 }
