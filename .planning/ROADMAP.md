@@ -185,12 +185,20 @@ Plans:
   4. Failed publication shows a safe summarized error.
   5. The system never posts AI-generated comments without explicit user approval.
 
-**Plans**: 2 plans
+**Plans**: 3 plans
 
 Plans:
+**Wave 1**
 
-- [ ] 05-01: Implement approved-draft publication service and GitHub client write path
-- [ ] 05-02: Add publish UI, per-draft status handling, and fake GitHub publication tests
+- [ ] 05-01: Add GitHub publication client write path and safe failure mapping
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 05-02: Implement approved-draft publication service and per-draft persistence
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 05-03: Add publish UI, per-draft status handling, and fake GitHub publication tests
 
 ## Future Direction
 
