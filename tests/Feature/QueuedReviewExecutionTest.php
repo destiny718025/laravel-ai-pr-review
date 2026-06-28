@@ -57,7 +57,7 @@ class QueuedReviewExecutionTest extends TestCase
         ]);
     }
 
-    public function test_review_detail_renders_structured_findings_without_draft_or_publish_controls(): void
+    public function test_review_detail_renders_structured_findings_and_local_draft_generation_without_publish_controls(): void
     {
         $reviewRun = $this->createReviewRunWithSnapshot();
         app(ReviewRunRepository::class)->queueForExecution($reviewRun);
@@ -70,7 +70,8 @@ class QueuedReviewExecutionTest extends TestCase
             ->assertSee('High Bug')
             ->assertSee('Unhandled malformed upstream payload')
             ->assertSee('Suggested comment: Please validate the provider response shape before consuming nested fields so malformed responses fail safely.')
-            ->assertDontSee('Draft')
+            ->assertSee('Comment Drafts')
+            ->assertSee('Generate Drafts')
             ->assertDontSee('Approve')
             ->assertDontSee('Publish');
     }

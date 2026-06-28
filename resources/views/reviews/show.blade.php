@@ -122,11 +122,11 @@
 
         <section class="section">
             <h2>Structured Findings</h2>
-            @if ($reviewRun->findings->isEmpty())
+            @if ($reviewRun->currentFindings->isEmpty())
                 <p class="muted">No AI review findings have been persisted for this run.</p>
             @else
                 <div class="metadata">
-                    @foreach ($reviewRun->findings as $finding)
+                    @foreach ($reviewRun->currentFindings as $finding)
                         <div class="metadata-row">
                             <span class="meta-label">{{ str($finding->severity)->title() }} {{ str($finding->category)->title() }}</span>
                             <span>
@@ -134,6 +134,34 @@
                                 {{ $finding->file_path }}@if ($finding->line_reference):{{ $finding->line_reference }}@endif<br>
                                 {{ $finding->rationale }}<br>
                                 Suggested comment: {{ $finding->suggested_comment_text }}
+                            </span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </section>
+
+        <section class="section">
+            <div class="detail-header" style="margin-bottom: 16px;">
+                <h2>Comment Drafts</h2>
+                <form method="POST" action="{{ route('reviews.drafts.generate', $reviewRun) }}">
+                    @csrf
+                    <button type="submit">Generate Drafts</button>
+                </form>
+            </div>
+
+            @if ($reviewRun->drafts->isEmpty())
+                <p class="muted">No comment drafts have been generated for this run.</p>
+            @else
+                <div class="metadata">
+                    @foreach ($reviewRun->drafts as $draft)
+                        <div class="metadata-row">
+                            <span class="meta-label">{{ str($draft->status->value)->title() }}</span>
+                            <span>
+                                <strong>{{ $draft->sourceFinding?->title ?: 'Source finding unavailable' }}</strong><br>
+                                {{ $draft->file_path }}@if ($draft->line_reference):{{ $draft->line_reference }}@endif<br>
+                                {{ $draft->body }}<br>
+                                Head SHA: {{ $draft->github_head_sha }}@if ($draft->source_file_sha)<br>File SHA: {{ $draft->source_file_sha }}@endif
                             </span>
                         </div>
                     @endforeach

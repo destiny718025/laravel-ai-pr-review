@@ -3,7 +3,9 @@
 namespace App\Repositories;
 
 use App\Data\AI\ValidatedFindingPayload;
+use App\Models\ReviewFinding;
 use App\Models\ReviewRun;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class ReviewFindingRepository
@@ -29,5 +31,16 @@ class ReviewFindingRepository
                 ]);
             }
         });
+    }
+
+    /**
+     * @return Collection<int, ReviewFinding>
+     */
+    public function currentWithoutDrafts(ReviewRun $reviewRun): Collection
+    {
+        return $reviewRun->currentFindings()
+            ->whereDoesntHave('sourceDrafts')
+            ->orderBy('id')
+            ->get();
     }
 }
