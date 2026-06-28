@@ -6,6 +6,7 @@ use App\Data\GitHub\PullRequestFileSnapshot;
 use App\Data\GitHub\PullRequestSnapshot;
 use App\Enums\ReviewRunStatus;
 use App\Jobs\ExecuteReviewRunJob;
+use App\Models\ReviewCommentDraft;
 use App\Models\ReviewFinding;
 use App\Models\ReviewRun;
 use App\Repositories\ReviewRunRepository;
@@ -109,6 +110,56 @@ class QueuedReviewExecutionTest extends TestCase
             ReviewFinding::query()
                 ->where('review_run_id', $reviewRun->id)
                 ->whereNull('superseded_at')
+                ->count(),
+        );
+    }
+
+    public function test_successful_retry_preserves_and_marks_existing_drafts_stale_before_new_drafts_are_generated(): void
+    {
+        $reviewRun = $this->createReviewRunWithSnapshot();
+        app(ReviewRunRepository::class)->queueForExecution($reviewRun);
+
+        (new ExecuteReviewRunJob($reviewRun->id))->handle(app(ReviewExecutionService::class));
+
+        $this->post(route('reviews.drafts.generate', $reviewRun))
+            ->assertRedirect(route('reviews.show', $reviewRun))
+            ->assertSessionHas('status', 'Generated 2 comment drafts.');
+
+        $firstFindingIds = ReviewFinding::query()
+            ->where('review_run_id', $reviewRun->id)
+            ->whereNull('superseded_at')
+            ->pluck('id');
+
+        $this->assertSame(
+            2,
+            ReviewCommentDraft::query()
+                ->where('review_run_id', $reviewRun->id)
+                ->whereNull('stale_at')
+                ->count(),
+        );
+
+        app(ReviewRunRepository::class)->queueForExecution(ReviewRun::findOrFail($reviewRun->id));
+        (new ExecuteReviewRunJob($reviewRun->id))->handle(app(ReviewExecutionService::class));
+
+        $this->assertSame(
+            2,
+            ReviewCommentDraft::query()
+                ->where('review_run_id', $reviewRun->id)
+                ->whereIn('source_review_finding_id', $firstFindingIds)
+                ->whereNotNull('stale_at')
+                ->count(),
+        );
+
+        $this->post(route('reviews.drafts.generate', $reviewRun))
+            ->assertRedirect(route('reviews.show', $reviewRun))
+            ->assertSessionHas('status', 'Generated 2 comment drafts.');
+
+        $this->assertSame(4, ReviewCommentDraft::query()->where('review_run_id', $reviewRun->id)->count());
+        $this->assertSame(
+            2,
+            ReviewCommentDraft::query()
+                ->where('review_run_id', $reviewRun->id)
+                ->whereNull('stale_at')
                 ->count(),
         );
     }
