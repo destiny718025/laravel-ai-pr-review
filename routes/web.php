@@ -11,4 +11,7 @@ Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store
 Route::post('/reviews/{reviewRun}/fetch', [ReviewController::class, 'fetch'])->name('reviews.fetch');
 Route::post('/reviews/{reviewRun}/run', [ReviewController::class, 'run'])->name('reviews.run');
 Route::post('/reviews/{reviewRun}/drafts/generate', [ReviewDraftController::class, 'generate'])->name('reviews.drafts.generate');
+Route::patch('/reviews/{reviewRun}/drafts/{reviewCommentDraft}', [ReviewDraftController::class, 'update'])->name('reviews.drafts.update');
+Route::post('/reviews/{reviewRun}/drafts/approve', [ReviewDraftController::class, 'approve'])->name('reviews.drafts.approve');
+Route::post('/reviews/{reviewRun}/drafts/{reviewCommentDraft}/unapprove', [ReviewDraftController::class, 'unapprove'])->name('reviews.drafts.unapprove');
 Route::get('/reviews/{reviewRun}', [ReviewController::class, 'show'])->name('reviews.show');

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Contracts\AI\AIReviewProvider;
 use App\Data\AI\AIReviewRequest;
 use App\Models\ReviewRun;
+use App\Repositories\ReviewCommentDraftRepository;
 use App\Repositories\ReviewFindingRepository;
 use App\Repositories\ReviewRunRepository;
 use App\Services\AI\AIReviewFailureMapper;
@@ -17,6 +18,7 @@ class ReviewExecutionService
     public function __construct(
         private readonly ReviewRunRepository $reviewRuns,
         private readonly ReviewFindingRepository $findings,
+        private readonly ReviewCommentDraftRepository $drafts,
         private readonly AIReviewProvider $provider,
         private readonly AIReviewPayloadValidator $validator,
         private readonly AIReviewFailureMapper $failureMapper,
@@ -43,6 +45,7 @@ class ReviewExecutionService
             $validatedFindings = $this->validator->validate($payload);
 
             DB::transaction(function () use ($reviewRun, $validatedFindings): void {
+                $this->drafts->markStaleForReviewRun($reviewRun);
                 $this->findings->supersedeCurrentForReviewRun($reviewRun);
                 $this->findings->storeCurrentForReviewRun($reviewRun, $validatedFindings);
                 $this->reviewRuns->markCompleted($reviewRun);

@@ -52,4 +52,53 @@ class ReviewCommentDraftRepository
                 'updated_at' => now(),
             ]);
     }
+
+    public function findForReviewRunOrFail(ReviewRun $reviewRun, int|string $draftId): ReviewCommentDraft
+    {
+        return ReviewCommentDraft::query()
+            ->where('review_run_id', $reviewRun->id)
+            ->whereKey($draftId)
+            ->firstOrFail();
+    }
+
+    /**
+     * @param  array<int, int>  $draftIds
+     * @return Collection<int, ReviewCommentDraft>
+     */
+    public function findManyForReviewRun(ReviewRun $reviewRun, array $draftIds): Collection
+    {
+        return ReviewCommentDraft::query()
+            ->where('review_run_id', $reviewRun->id)
+            ->whereIn('id', $draftIds)
+            ->orderBy('id')
+            ->get();
+    }
+
+    public function updateBody(ReviewCommentDraft $draft, string $body): ReviewCommentDraft
+    {
+        $draft->forceFill(['body' => $body])->save();
+
+        return $draft->refresh();
+    }
+
+    /**
+     * @param  array<int, int>  $draftIds
+     */
+    public function markApprovedForIds(ReviewRun $reviewRun, array $draftIds): int
+    {
+        return ReviewCommentDraft::query()
+            ->where('review_run_id', $reviewRun->id)
+            ->whereIn('id', $draftIds)
+            ->update([
+                'status' => ReviewCommentDraftStatus::Approved,
+                'updated_at' => now(),
+            ]);
+    }
+
+    public function markDraft(ReviewCommentDraft $draft): ReviewCommentDraft
+    {
+        $draft->forceFill(['status' => ReviewCommentDraftStatus::Draft])->save();
+
+        return $draft->refresh();
+    }
 }

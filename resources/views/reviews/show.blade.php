@@ -153,14 +153,51 @@
             @if ($reviewRun->drafts->isEmpty())
                 <p class="muted">No comment drafts have been generated for this run.</p>
             @else
+                <form id="approve-drafts-form" method="POST" action="{{ route('reviews.drafts.approve', $reviewRun) }}" style="margin-bottom: 16px;">
+                    @csrf
+                    <button type="submit">Approve Selected</button>
+                </form>
+
                 <div class="metadata">
                     @foreach ($reviewRun->drafts as $draft)
                         <div class="metadata-row">
-                            <span class="meta-label">{{ str($draft->status->value)->title() }}</span>
+                            <span class="meta-label">
+                                {{ str($draft->status->value)->title() }}
+                                @if ($draft->stale_at)
+                                    <br>Stale Draft
+                                @endif
+                            </span>
                             <span>
                                 <strong>{{ $draft->sourceFinding?->title ?: 'Source finding unavailable' }}</strong><br>
                                 {{ $draft->file_path }}@if ($draft->line_reference):{{ $draft->line_reference }}@endif<br>
-                                {{ $draft->body }}<br>
+                                @if ($draft->stale_at)
+                                    <span class="muted">This draft is stale because the review run was retried after it was generated.</span><br>
+                                @endif
+
+                                @if ($draft->status->isDraft())
+                                    <label style="display: flex; gap: 8px; align-items: center; margin: 12px 0;">
+                                        <input type="checkbox" name="draft_ids[]" value="{{ $draft->id }}" form="approve-drafts-form">
+                                        Select for approval
+                                    </label>
+
+                                    <form method="POST" action="{{ route('reviews.drafts.update', [$reviewRun, $draft]) }}" style="display: grid; gap: 12px; margin: 12px 0;">
+                                        @csrf
+                                        @method('PATCH')
+                                        <label for="draft-body-{{ $draft->id }}">Comment draft text</label>
+                                        <textarea id="draft-body-{{ $draft->id }}" name="body" rows="5" style="width: 100%; border: 1px solid #D7DEE2; border-radius: 8px; padding: 12px; font: inherit;">{{ $draft->body }}</textarea>
+                                        <button type="submit" style="justify-self: start;">Save Draft</button>
+                                    </form>
+                                @else
+                                    {{ $draft->body }}<br>
+                                @endif
+
+                                @if ($draft->status->isApproved())
+                                    <form method="POST" action="{{ route('reviews.drafts.unapprove', [$reviewRun, $draft]) }}" style="margin: 12px 0;">
+                                        @csrf
+                                        <button type="submit">Cancel Approval</button>
+                                    </form>
+                                @endif
+
                                 Head SHA: {{ $draft->github_head_sha }}@if ($draft->source_file_sha)<br>File SHA: {{ $draft->source_file_sha }}@endif
                             </span>
                         </div>

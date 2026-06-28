@@ -99,12 +99,13 @@ class QueuedReviewFailureTest extends TestCase
         app(ReviewRunRepository::class)->queueForExecution(ReviewRun::findOrFail($reviewRun->id));
         (new ExecuteReviewRunJob($reviewRun->id))->handle(app(ReviewExecutionService::class));
 
-        $reviewRun = ReviewRun::query()->with('findings')->findOrFail($reviewRun->id);
+        $reviewRun = ReviewRun::query()->with(['findings', 'currentFindings'])->findOrFail($reviewRun->id);
 
         $this->assertSame(ReviewRunStatus::Completed, $reviewRun->status);
         $this->assertNull($reviewRun->safe_error_message);
         $this->assertNull($reviewRun->failed_at);
-        $this->assertCount(2, $reviewRun->findings);
+        $this->assertCount(4, $reviewRun->findings);
+        $this->assertCount(2, $reviewRun->currentFindings);
         $this->assertDatabaseHas('review_findings', [
             'review_run_id' => $reviewRun->id,
             'title' => 'Unhandled malformed upstream payload',
