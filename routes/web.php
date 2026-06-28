@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReviewDraftController;
+use App\Http\Controllers\ReviewInstructionSettingController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/reviews');
 
+Route::put('/review-instructions', [ReviewInstructionSettingController::class, 'update'])->name('review-instructions.update');
 Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 Route::post('/reviews/{reviewRun}/fetch', [ReviewController::class, 'fetch'])->name('reviews.fetch');

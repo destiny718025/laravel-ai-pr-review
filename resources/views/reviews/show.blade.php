@@ -208,6 +208,25 @@
     @endif
 
     <section class="section">
+        <h2>Custom Review Instructions</h2>
+        <form method="POST" action="{{ route('review-instructions.update') }}" style="display: grid; gap: 12px;">
+            @csrf
+            @method('PUT')
+
+            <label for="custom-review-instructions">Instructions for future AI reviews</label>
+            <textarea id="custom-review-instructions" name="custom_instructions" rows="6" style="width: 100%; border: 1px solid #D7DEE2; border-radius: 8px; padding: 12px; font: inherit;">{{ old('custom_instructions', $customReviewInstructions) }}</textarea>
+
+            @error('custom_instructions', 'instructions')
+                <div class="error-block" style="margin-top: 0;">
+                    <strong>{{ $message }}</strong>
+                </div>
+            @enderror
+
+            <button type="submit" style="justify-self: start;">Save Instructions</button>
+        </form>
+    </section>
+
+    <section class="section">
         <h2>Run Metadata</h2>
         <div class="metadata">
             <div class="metadata-row">
