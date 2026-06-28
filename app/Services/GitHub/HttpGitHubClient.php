@@ -3,6 +3,8 @@
 namespace App\Services\GitHub;
 
 use App\Contracts\GitHub\GitHubClient;
+use App\Data\GitHub\GitHubCommentPublicationResult;
+use App\Data\GitHub\GitHubCommentPublicationTarget;
 use App\Data\GitHub\PullRequestFileSnapshot;
 use App\Data\GitHub\PullRequestSnapshot;
 use Illuminate\Http\Client\PendingRequest;
@@ -57,6 +59,32 @@ class HttpGitHubClient implements GitHubClient
         return $files;
     }
 
+    public function createPullRequestReviewComment(GitHubCommentPublicationTarget $target): GitHubCommentPublicationResult
+    {
+        $payload = $this->request()
+            ->post(
+                $this->repositoryPath($target->owner, $target->repository)."/pulls/{$target->pullRequestNumber}/comments",
+                $target->toPullRequestReviewCommentPayload(),
+            )
+            ->throw()
+            ->json();
+
+        return $this->parsePublicationResult($payload, 'GitHub pull request review comment response must be an object.');
+    }
+
+    public function createPullRequestIssueComment(GitHubCommentPublicationTarget $target): GitHubCommentPublicationResult
+    {
+        $payload = $this->request()
+            ->post(
+                $this->repositoryPath($target->owner, $target->repository)."/issues/{$target->pullRequestNumber}/comments",
+                $target->toIssueCommentPayload(),
+            )
+            ->throw()
+            ->json();
+
+        return $this->parsePublicationResult($payload, 'GitHub issue comment response must be an object.');
+    }
+
     private function request(): PendingRequest
     {
         $request = Http::baseUrl((string) config('services.github.base_url', 'https://api.github.com'))
@@ -77,6 +105,15 @@ class HttpGitHubClient implements GitHubClient
     private function repositoryPath(string $owner, string $repository): string
     {
         return '/repos/'.rawurlencode($owner).'/'.rawurlencode($repository);
+    }
+
+    private function parsePublicationResult(mixed $payload, string $message): GitHubCommentPublicationResult
+    {
+        if (! is_array($payload)) {
+            throw new \UnexpectedValueException($message);
+        }
+
+        return GitHubCommentPublicationResult::fromGitHubPayload($payload);
     }
 
     private function hasNextPage(?string $linkHeader): bool

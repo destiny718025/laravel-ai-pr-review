@@ -46,7 +46,7 @@ class HttpGitHubClientPublicationTest extends TestCase
         $this->assertSame(['id', 'htmlUrl', 'postedAt'], array_keys(get_object_vars($result)));
         $this->assertSame('123456789', $result->id);
         $this->assertSame('https://github.com/laravel/framework/pull/1#discussion_r123456789', $result->htmlUrl);
-        $this->assertSame('2026-06-29T01:02:03Z', $result->postedAt->toISOString());
+        $this->assertSame('2026-06-29 01:02:03', $result->postedAt->utc()->format('Y-m-d H:i:s'));
 
         Http::assertSent(function ($request): bool {
             return $request->url() === 'https://api.github.com/repos/laravel/framework/pulls/1/comments'
@@ -88,7 +88,7 @@ class HttpGitHubClientPublicationTest extends TestCase
         $this->assertSame(['id', 'htmlUrl', 'postedAt'], array_keys(get_object_vars($result)));
         $this->assertSame('987654321', $result->id);
         $this->assertSame('https://github.com/laravel/framework/pull/1#issuecomment-987654321', $result->htmlUrl);
-        $this->assertSame('2026-06-29T01:02:03Z', $result->postedAt->toISOString());
+        $this->assertSame('2026-06-29 01:02:03', $result->postedAt->utc()->format('Y-m-d H:i:s'));
 
         Http::assertSent(function ($request): bool {
             $data = $request->data();

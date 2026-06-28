@@ -3,10 +3,10 @@
 namespace Tests\Unit\GitHub;
 
 use App\Services\GitHub\GitHubFailureMapper;
+use GuzzleHttp\Psr7\Response as PsrResponse;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
-use GuzzleHttp\Psr7\Response as PsrResponse;
 use Tests\TestCase;
 
 class GitHubFailureMapperTest extends TestCase
