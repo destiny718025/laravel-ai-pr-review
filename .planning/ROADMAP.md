@@ -13,7 +13,7 @@ The v1 roadmap builds a vertical MVP from a usable Laravel management interface 
 
 - [x] **Phase 1: Review Run Foundation and Management UI** - User can submit PR URLs and see persisted review run status/history
 - [x] **Phase 2: GitHub PR Ingestion** - System fetches PR metadata/files and stores replayable diff snapshots (completed 2026-06-27)
-- [ ] **Phase 3: Queued AI Review and Structured Findings** - System executes review jobs through an AI provider interface and persists validated findings
+- [x] **Phase 3: Queued AI Review and Structured Findings** - System executes review jobs through an AI provider interface and persists validated findings (completed 2026-06-28)
 - [ ] **Phase 4: Draft Review and Custom Instructions** - User can inspect findings, edit drafts, approve drafts, and tune simple instructions
 - [ ] **Phase 5: GitHub Comment Publishing** - User can publish approved drafts to GitHub with per-draft status and error handling
 
@@ -88,7 +88,7 @@ Plans:
 
 ### Phase 3: Queued AI Review and Structured Findings
 
-**Goal**: Execute review work asynchronously and persist validated AI findings.
+**Goal**: As a reviewer, I want to run AI review asynchronously for a fetched GitHub pull request, so that validated findings are persisted and visible without blocking the request.
 **Mode:** mvp
 **Depends on**: Phase 2
 **Requirements**: [EXEC-01, EXEC-02, EXEC-03, EXEC-04, EXEC-05, AI-01, AI-02, AI-03, AI-04, AI-05, AI-06, AI-07, AI-08]
@@ -183,6 +183,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Review Run Foundation and Management UI | 4/4 | Complete | 2026-06-27 |
 | 2. GitHub PR Ingestion | 3/3 | Complete    | 2026-06-27 |
-| 3. Queued AI Review and Structured Findings | 5/5 | Ready for verification | - |
+| 3. Queued AI Review and Structured Findings | 5/5 | Complete    | 2026-06-28 |
 | 4. Draft Review and Custom Instructions | 0/3 | Not started | - |
 | 5. GitHub Comment Publishing | 0/2 | Not started | - |
