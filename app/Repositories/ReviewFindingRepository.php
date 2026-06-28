@@ -8,16 +8,25 @@ use Illuminate\Support\Facades\DB;
 
 class ReviewFindingRepository
 {
+    public function supersedeCurrentForReviewRun(ReviewRun $reviewRun): int
+    {
+        return $reviewRun->currentFindings()->update([
+            'superseded_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
     /**
      * @param  array<int, ValidatedFindingPayload>  $findings
      */
-    public function replaceForReviewRun(ReviewRun $reviewRun, array $findings): void
+    public function storeCurrentForReviewRun(ReviewRun $reviewRun, array $findings): void
     {
         DB::transaction(function () use ($reviewRun, $findings): void {
-            $reviewRun->findings()->delete();
-
             foreach ($findings as $finding) {
-                $reviewRun->findings()->create($finding->toDatabaseArray());
+                $reviewRun->findings()->create([
+                    ...$finding->toDatabaseArray(),
+                    'superseded_at' => null,
+                ]);
             }
         });
     }

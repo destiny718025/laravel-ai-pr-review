@@ -2,24 +2,24 @@
 
 namespace App\Models;
 
+use App\Enums\ReviewCommentDraftStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'review_run_id',
-    'severity',
-    'category',
+    'source_review_finding_id',
+    'status',
+    'body',
     'file_path',
     'line_reference',
-    'title',
-    'rationale',
-    'suggested_comment_text',
-    'superseded_at',
+    'github_head_sha',
+    'source_file_sha',
+    'stale_at',
 ])]
-class ReviewFinding extends Model
+class ReviewCommentDraft extends Model
 {
     use HasFactory;
 
@@ -32,11 +32,11 @@ class ReviewFinding extends Model
     }
 
     /**
-     * @return HasMany<ReviewCommentDraft, $this>
+     * @return BelongsTo<ReviewFinding, $this>
      */
-    public function sourceDrafts(): HasMany
+    public function sourceFinding(): BelongsTo
     {
-        return $this->hasMany(ReviewCommentDraft::class, 'source_review_finding_id');
+        return $this->belongsTo(ReviewFinding::class, 'source_review_finding_id');
     }
 
     /**
@@ -47,7 +47,8 @@ class ReviewFinding extends Model
     protected function casts(): array
     {
         return [
-            'superseded_at' => 'datetime',
+            'status' => ReviewCommentDraftStatus::class,
+            'stale_at' => 'datetime',
         ];
     }
 }

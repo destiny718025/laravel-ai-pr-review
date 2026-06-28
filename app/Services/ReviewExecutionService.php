@@ -43,7 +43,8 @@ class ReviewExecutionService
             $validatedFindings = $this->validator->validate($payload);
 
             DB::transaction(function () use ($reviewRun, $validatedFindings): void {
-                $this->findings->replaceForReviewRun($reviewRun, $validatedFindings);
+                $this->findings->supersedeCurrentForReviewRun($reviewRun);
+                $this->findings->storeCurrentForReviewRun($reviewRun, $validatedFindings);
                 $this->reviewRuns->markCompleted($reviewRun);
             });
         } catch (\Throwable $throwable) {
