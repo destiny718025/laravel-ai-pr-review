@@ -141,13 +141,28 @@ Plans:
   4. Drafts track draft/approved/posted/failed state and retain GitHub targeting metadata.
   5. User can edit custom review instructions and future AI reviews include them.
 
-**Plans**: 3 plans
+**Plans**: 5 plans
 
 Plans:
+**Wave 1**
 
-- [ ] 04-01: Add findings/drafts repositories, models, and detail-page presentation
-- [ ] 04-02: Build draft edit and approval workflow
-- [ ] 04-03: Build custom instructions settings UI and service integration
+- [ ] 04-01: Add draft persistence foundation and superseded-finding provenance
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 04-02: Add manual draft generation and split detail-page presentation
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 04-03: Build draft edit/approve/unapprove workflow and retry stale marking
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 04-04: Add global custom-instructions storage and management UI
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 04-05: Integrate saved custom instructions into future AI execution and retries
 
 ### Phase 5: GitHub Comment Publishing
 
@@ -184,5 +199,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Review Run Foundation and Management UI | 4/4 | Complete | 2026-06-27 |
 | 2. GitHub PR Ingestion | 3/3 | Complete    | 2026-06-27 |
 | 3. Queued AI Review and Structured Findings | 5/5 | Complete    | 2026-06-28 |
-| 4. Draft Review and Custom Instructions | 0/3 | Not started | - |
+| 4. Draft Review and Custom Instructions | 0/5 | Not started | - |
 | 5. GitHub Comment Publishing | 0/2 | Not started | - |
