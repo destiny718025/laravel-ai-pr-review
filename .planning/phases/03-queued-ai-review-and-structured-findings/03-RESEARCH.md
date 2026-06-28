@@ -61,7 +61,7 @@
 | EXEC-05 | Review execution avoids logging raw API credentials, authorization headers, or unredacted provider payloads. [VERIFIED: codebase] | Reserve provider secrets in `config/services.php`, never persist raw provider bodies, and map exceptions to safe summaries only. [VERIFIED: codebase] [CITED: https://laravel.com/docs/13.x/http-client] |
 | AI-01 | System defines an AI review provider interface for generating structured review output. [VERIFIED: codebase] | Mirror the existing `GitHubClient` pattern with an `AIReviewProvider` contract bound in `AppServiceProvider`. The contract should expose generated structured review content behind the interface, not vendor-specific SDK types. [VERIFIED: codebase] [CITED: https://laravel.com/docs/13.x/container] |
 | AI-02 | System includes a fake AI review provider for deterministic local tests. [VERIFIED: codebase] | Make the fake provider the default test path and drive it with fixed JSON payloads or fixed decoded arrays so feature tests stay deterministic and offline. [VERIFIED: codebase] |
-| AI-03 | System can use one concrete AI provider implementation behind the provider interface. [VERIFIED: codebase] | Reserve `services.openai` config now and, if Plan `03-03` is implemented in this phase, keep the concrete adapter opt-in and HTTP-fakeable; Phase 3 must not require live OpenAI access. [VERIFIED: codebase] [CITED: https://laravel.com/docs/13.x/http-client] [CITED: https://platform.openai.com/docs/guides/structured-outputs] |
+| AI-03 | System can use one concrete AI provider implementation behind the provider interface. [VERIFIED: codebase] | Reserve `services.openai` config now and implement an opt-in `HttpOpenAIReviewProvider` in Plan `03-04`; Phase 3 stays fake-provider-first and must not require live OpenAI access. [VERIFIED: codebase] [CITED: https://laravel.com/docs/13.x/http-client] [CITED: https://platform.openai.com/docs/guides/structured-outputs] |
 | AI-04 | AI review output is validated against a structured finding schema before persistence. [VERIFIED: codebase] | Decode provider JSON with a hard failure on invalid JSON, then validate the decoded array with Laravel validation rules for allowed keys, required keys, and nested finding fields before any database write occurs. [CITED: https://laravel.com/docs/13.x/validation] |
 | AI-05 | Structured findings include severity, category, file path, line reference when available, title, rationale, and suggested comment text. [VERIFIED: codebase] | Persist one findings table keyed to `review_run_id` with those exact fields; keep `line_reference` nullable and separate from future GitHub draft-targeting metadata because Phase 2 intentionally stopped at raw snapshot storage. [VERIFIED: codebase] |
 | AI-06 | Default review instructions prioritize bug and security issues. [VERIFIED: codebase] | Put a default review-instructions builder in the service/provider seam and make “bugs and security first” the system instruction baseline. [VERIFIED: codebase] |
@@ -119,7 +119,7 @@ The critical planning decisions are around failure taxonomy and retry behavior. 
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
 | PHPUnit | `12.5.30` [VERIFIED: codebase] | Feature and unit coverage for dispatch, execution, validation, failure mapping, and retry behavior. [VERIFIED: codebase] | Use for all Nyquist verification in this phase. [VERIFIED: codebase] |
-| Laravel HTTP client | Built into `laravel/framework v13.17.0`. [VERIFIED: codebase] | Supports any future OpenAI HTTP adapter stub and enables offline provider tests through fakes. [CITED: https://laravel.com/docs/13.x/http-client] | Use only if Plan `03-03` includes an opt-in concrete adapter; Phase 3 must still be fake-first. [VERIFIED: codebase] |
+| Laravel HTTP client | Built into `laravel/framework v13.17.0`. [VERIFIED: codebase] | Supports the opt-in `HttpOpenAIReviewProvider` seam and enables offline adapter tests through fakes. [CITED: https://laravel.com/docs/13.x/http-client] | Use in Plan `03-04` for the optional concrete adapter while keeping Phase 3 fake-first. [VERIFIED: codebase] |
 | Laravel queue test helpers | Built into `laravel/framework v13.17.0`. [VERIFIED: codebase] | Support `Queue::fake`, dispatch assertions, and selective execution boundaries. [VERIFIED: codebase] | Use for dispatch-boundary tests; use sync execution for end-to-end job behavior tests. [VERIFIED: codebase] |
 | Laravel validator | Built into `laravel/framework v13.17.0`. [VERIFIED: codebase] | Validates decoded provider payloads with allowed keys, required keys, and nested finding rules. [CITED: https://laravel.com/docs/13.x/validation] | Use immediately after JSON decode and before any persistence. [CITED: https://laravel.com/docs/13.x/validation] |
 
@@ -238,8 +238,8 @@ This structure extends the repo’s existing `Contracts`, `Data`, `Repositories`
 | Field | Recommended Type | Notes |
 |-------|------------------|-------|
 | `review_run_id` | `foreignId` | Required owner of all findings; cascade on delete with the run. [VERIFIED: codebase] |
-| `severity` | `string` | Validate against a small app-owned vocabulary in Laravel rules rather than a database enum. [CITED: https://laravel.com/docs/13.x/validation] |
-| `category` | `string` | Validate against a small app-owned vocabulary aligned with bug/security-first review goals. [VERIFIED: codebase] |
+| `severity` | `string` | Validate against the app-owned vocabulary `critical`, `high`, `medium`, `low` in Laravel rules rather than a database enum. [CITED: https://laravel.com/docs/13.x/validation] |
+| `category` | `string` | Validate against the app-owned vocabulary `bug`, `security`, `performance`, `maintainability`, `style`, with bug/security prioritized in default instructions. [VERIFIED: codebase] |
 | `file_path` | `string` | Store the GitHub snapshot filename that the finding refers to. [VERIFIED: codebase] |
 | `line_reference` | `string` nullable | Keep this human-facing and optional; Phase 3 is not yet the phase for GitHub `line` / `side` targeting metadata. [VERIFIED: codebase] |
 | `title` | `string` | Short user-visible summary for the finding. [VERIFIED: codebase] |
@@ -492,17 +492,13 @@ Validator::make($payload, [
 
 All claims in this research were verified from the codebase or cited from official documentation. No `[ASSUMED]` claims remain.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should Plan `03-03` implement an opt-in OpenAI HTTP adapter now, or only reserve the seam/config?**
-   - What we know: D-06 requires reserved OpenAI config without making Phase 3 depend on live calls, and D-07 explicitly allows the planner to keep the concrete adapter as a seam or stub. [VERIFIED: codebase]
-   - What's unclear: Whether the planner wants a stub class plus HTTP-fake coverage in this phase, or to stop at fake-provider completeness. [VERIFIED: codebase]
-   - Recommendation: Plan the fake provider and config reservation as mandatory, and keep any concrete OpenAI adapter opt-in and offline-testable if it is included. [VERIFIED: codebase] [CITED: https://laravel.com/docs/13.x/http-client]
+1. **OpenAI adapter scope**
+   - Resolution: Phase 3 includes an opt-in `HttpOpenAIReviewProvider` behind `AIReviewProvider`, with reserved `services.openai.*` config and HTTP-fakeable tests in Plan `03-04`. The default execution path remains `FakeAIReviewProvider`, and Phase 3 verification must not require live OpenAI calls. [VERIFIED: codebase] [CITED: https://laravel.com/docs/13.x/http-client]
 
-2. **What exact severity/category vocabularies should the schema lock in?**
-   - What we know: The findings schema must include `severity` and `category`, and default instructions must prioritize bugs and security issues while allowing limited style feedback. [VERIFIED: codebase]
-   - What's unclear: The exact label set the planner wants the UI, fake provider, and validator to share. [VERIFIED: codebase]
-   - Recommendation: Choose a small app-owned vocabulary in the plan and centralize it in one validator/enum source so the fake provider, persistence, and UI all use the same tokens. [VERIFIED: codebase] [CITED: https://laravel.com/docs/13.x/validation]
+2. **Severity/category vocabulary**
+   - Resolution: Structured findings use severity values `critical`, `high`, `medium`, `low` and category values `bug`, `security`, `performance`, `maintainability`, `style`. Default instructions prioritize bug/security findings; style findings are allowed only when useful and not noisy. The validator, fixtures, tests, and UI should share these exact tokens. [VERIFIED: codebase] [CITED: https://laravel.com/docs/13.x/validation]
 
 ## Environment Availability
 
@@ -543,15 +539,15 @@ All claims in this research were verified from the codebase or cited from offici
 | EXEC-02 | Job reloads the run and marks it `running` before external work. [VERIFIED: codebase] | feature | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=QueuedReviewExecution` [VERIFIED: docker exec] | ❌ Wave 0 |
 | EXEC-03 | Successful execution persists validated findings and marks the run `completed`. [VERIFIED: codebase] | feature | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=QueuedReviewExecution` [VERIFIED: docker exec] | ❌ Wave 0 |
 | EXEC-04 | Provider, decode, validation, and runtime failures mark the run `failed` with safe summaries. [VERIFIED: codebase] | feature + unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=QueuedReviewFailure` [VERIFIED: docker exec] | ❌ Wave 0 |
-| EXEC-05 | No unsafe provider secrets or payload fragments leak to persisted safe errors. [VERIFIED: codebase] | feature + unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=ReviewExecutionFailure` [VERIFIED: docker exec] | ❌ Wave 0 |
-| AI-01 | AI provider contract resolves through the container. [VERIFIED: codebase] | unit + feature | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=AIReviewProvider` [VERIFIED: docker exec] | ❌ Wave 0 |
-| AI-02 | Fake provider supplies deterministic findings without network access. [VERIFIED: codebase] | feature | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=FakeAIReviewProvider` [VERIFIED: docker exec] | ❌ Wave 0 |
-| AI-03 | Optional concrete provider seam stays behind the interface and is HTTP-fakeable if implemented. [VERIFIED: codebase] | unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=HttpOpenAIReviewProvider` [VERIFIED: docker exec] | ❌ Wave 0 |
-| AI-04 | Decoded provider payload is validated against the structured findings schema. [VERIFIED: codebase] | unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=ValidatedFindingPayload` [VERIFIED: docker exec] | ❌ Wave 0 |
-| AI-05 | Persisted findings include severity, category, file path, optional line reference, title, rationale, and suggested comment text. [VERIFIED: codebase] | feature | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=ReviewFindingPersistence` [VERIFIED: docker exec] | ❌ Wave 0 |
-| AI-06 | Default instructions prioritize bugs and security issues. [VERIFIED: codebase] | unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=DefaultReviewInstructions` [VERIFIED: docker exec] | ❌ Wave 0 |
-| AI-07 | Default instructions allow useful, non-noisy Laravel/PHP style feedback. [VERIFIED: codebase] | unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=DefaultReviewInstructions` [VERIFIED: docker exec] | ❌ Wave 0 |
-| AI-08 | Invalid or incomplete AI output fails safely without malformed findings. [VERIFIED: codebase] | feature + unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=ReviewExecutionFailure` [VERIFIED: docker exec] | ❌ Wave 0 |
+| EXEC-05 | No unsafe provider secrets or payload fragments leak to persisted safe errors. [VERIFIED: codebase] | feature + unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter='ValidatedFindingPayloadTest|AIReviewFailureMapperTest|QueuedReviewFailureTest|OpenAIReviewProviderTest'` [VERIFIED: docker exec] | ❌ Wave 0 |
+| AI-01 | AI provider contract resolves through the container. [VERIFIED: codebase] | unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=FakeAIReviewProviderTest` [VERIFIED: docker exec] | ❌ Wave 0 |
+| AI-02 | Fake provider supplies deterministic findings without network access. [VERIFIED: codebase] | unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=FakeAIReviewProviderTest` [VERIFIED: docker exec] | ❌ Wave 0 |
+| AI-03 | Optional concrete provider seam stays behind the interface and is HTTP-fakeable. [VERIFIED: codebase] | unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=OpenAIReviewProviderTest` [VERIFIED: docker exec] | ❌ Wave 0 |
+| AI-04 | Decoded provider payload is validated against the structured findings schema. [VERIFIED: codebase] | unit + feature | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter='ValidatedFindingPayloadTest|QueuedReviewExecutionTest'` [VERIFIED: docker exec] | ❌ Wave 0 |
+| AI-05 | Persisted findings include severity, category, file path, optional line reference, title, rationale, and suggested comment text. [VERIFIED: codebase] | feature | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter='QueuedReviewExecutionTest|QueuedReviewFailureTest'` [VERIFIED: docker exec] | ❌ Wave 0 |
+| AI-06 | Default instructions prioritize bugs and security issues. [VERIFIED: codebase] | unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=FakeAIReviewProviderTest` [VERIFIED: docker exec] | ❌ Wave 0 |
+| AI-07 | Default instructions allow useful, non-noisy Laravel/PHP style feedback. [VERIFIED: codebase] | unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=FakeAIReviewProviderTest` [VERIFIED: docker exec] | ❌ Wave 0 |
+| AI-08 | Invalid or incomplete AI output fails safely without malformed findings. [VERIFIED: codebase] | feature + unit | `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter='ValidatedFindingPayloadTest|AIReviewFailureMapperTest|QueuedReviewFailureTest'` [VERIFIED: docker exec] | ❌ Wave 0 |
 
 ### Sampling Rate
 - **Per task commit:** `docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 php artisan test --filter=QueuedReview` [VERIFIED: docker exec]
@@ -562,8 +558,10 @@ All claims in this research were verified from the codebase or cited from offici
 - [ ] `tests/Feature/QueuedReviewDispatchTest.php` — manual run action, queue dispatch, precondition gate, and retry-admission coverage. [VERIFIED: codebase]
 - [ ] `tests/Feature/QueuedReviewExecutionTest.php` — `running` / `completed` transitions plus findings replacement coverage under sync queue execution. [VERIFIED: codebase]
 - [ ] `tests/Feature/QueuedReviewFailureTest.php` — timeout/transport, invalid JSON, invalid schema, unexpected runtime, and retry cleanup coverage. [VERIFIED: codebase]
+- [ ] `tests/Unit/AI/FakeAIReviewProviderTest.php` — provider interface resolution, fixture seam, and default instruction vocabulary. [VERIFIED: codebase]
 - [ ] `tests/Unit/AI/ValidatedFindingPayloadTest.php` — nested schema validation and vocabulary enforcement. [VERIFIED: codebase]
 - [ ] `tests/Unit/AI/AIReviewFailureMapperTest.php` — safe code/message mapping without raw exception leakage. [VERIFIED: codebase]
+- [ ] `tests/Unit/AI/OpenAIReviewProviderTest.php` — opt-in OpenAI adapter seam and HTTP-fakeable request coverage. [VERIFIED: codebase]
 - [ ] `database/factories/GitHubRepositoryFactory.php`, `PullRequestFactory.php`, `ReviewRunFactory.php`, and `ReviewFindingFactory.php` — the repo currently only has `UserFactory`. [VERIFIED: codebase]
 
 ## Security Domain
