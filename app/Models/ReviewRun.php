@@ -41,6 +41,14 @@ class ReviewRun extends Model
     }
 
     /**
+     * @return HasMany<ReviewFinding, $this>
+     */
+    public function findings(): HasMany
+    {
+        return $this->hasMany(ReviewFinding::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

@@ -70,7 +70,7 @@ class ReviewRunHistoryAndDetailTest extends TestCase
             ->assertOk()
             ->assertSee('Review run failed')
             ->assertSee('GitHub returned a safe validation error.')
-            ->assertSee('Review the safe error summary, then create a new run after fixing the source issue.');
+            ->assertSee('Review the safe error summary, then run AI review again after fixing the source issue.');
     }
 
     public function test_failed_review_detail_uses_safe_fallback_when_no_summary_exists(): void
@@ -84,7 +84,7 @@ class ReviewRunHistoryAndDetailTest extends TestCase
             ->assertOk()
             ->assertSee('Review run failed')
             ->assertSee('The run failed, but no safe error summary was recorded.')
-            ->assertSee('Review the safe error summary, then create a new run after fixing the source issue.');
+            ->assertSee('Review the safe error summary, then run AI review again after fixing the source issue.');
     }
 
     public function test_reserved_statuses_render_title_case_labels(): void

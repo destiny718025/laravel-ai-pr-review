@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Repositories\ReviewRunRepository;
 use App\Services\PullRequestIngestionService;
+use App\Services\ReviewExecutionDispatchService;
 use App\Services\ReviewRunService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,6 +50,22 @@ class ReviewController extends Controller
     public function fetch(int|string $reviewRun, PullRequestIngestionService $pullRequestIngestionService): RedirectResponse
     {
         $result = $pullRequestIngestionService->fetch($reviewRun);
+
+        if (! $result->successful()) {
+            return redirect()
+                ->route('reviews.show', $result->reviewRun())
+                ->with('service_error_code', $result->errorCode())
+                ->with('service_error_message', $result->message());
+        }
+
+        return redirect()
+            ->route('reviews.show', $result->reviewRun())
+            ->with('status', $result->message());
+    }
+
+    public function run(int|string $reviewRun, ReviewExecutionDispatchService $reviewExecutionDispatchService): RedirectResponse
+    {
+        $result = $reviewExecutionDispatchService->dispatch($reviewRun);
 
         if (! $result->successful()) {
             return redirect()
