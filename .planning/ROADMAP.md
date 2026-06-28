@@ -104,10 +104,26 @@ Plans:
 
 Plans:
 
-- [ ] 03-01: Add review execution job and status transitions
-- [ ] 03-02: Define AI provider interface, fake provider, and structured review schema
-- [ ] 03-03: Add concrete AI provider implementation behind the interface
-- [ ] 03-04: Persist validated findings and harden failure/redaction behavior
+- [ ] 03-01-PLAN.md — Add manual run action, queued dispatch, and lifecycle status transitions
+- [ ] 03-02-PLAN.md — Add fake-first AI provider seam, default instructions, and structured output validation
+- [ ] 03-03-PLAN.md — Add opt-in OpenAI adapter wiring behind the provider interface
+- [ ] 03-04-PLAN.md — Persist validated findings, render them on the detail page, and harden retry/failure behavior
+
+**Wave 1**
+
+- [ ] 03-01: Add manual run action, queued dispatch, and lifecycle status transitions
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-02: Add fake-first AI provider seam, default instructions, and structured output validation
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 03-03: Add opt-in OpenAI adapter wiring behind the provider interface
+
+**Wave 4** *(blocked on Waves 2 and 3 completion)*
+
+- [ ] 03-04: Persist validated findings, render them on the detail page, and harden retry/failure behavior
 
 ### Phase 4: Draft Review and Custom Instructions
 
