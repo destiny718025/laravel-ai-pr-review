@@ -14,7 +14,7 @@ The v1 roadmap builds a vertical MVP from a usable Laravel management interface 
 - [x] **Phase 1: Review Run Foundation and Management UI** - User can submit PR URLs and see persisted review run status/history
 - [x] **Phase 2: GitHub PR Ingestion** - System fetches PR metadata/files and stores replayable diff snapshots (completed 2026-06-27)
 - [x] **Phase 3: Queued AI Review and Structured Findings** - System executes review jobs through an AI provider interface and persists validated findings (completed 2026-06-28)
-- [ ] **Phase 4: Draft Review and Custom Instructions** - User can inspect findings, edit drafts, approve drafts, and tune simple instructions
+- [x] **Phase 4: Draft Review and Custom Instructions** - User can inspect findings, edit drafts, approve drafts, and tune simple instructions (completed 2026-06-28)
 - [ ] **Phase 5: GitHub Comment Publishing** - User can publish approved drafts to GitHub with per-draft status and error handling
 
 ## Phase Details
@@ -141,15 +141,15 @@ Plans:
   4. Drafts track draft/approved/posted/failed state and retain GitHub targeting metadata.
   5. User can edit custom review instructions and future AI reviews include them.
 
-**Plans**: 1/5 plans executed
+**Plans**: 5/5 plans executed
 
 Plans:
 
 - [x] 04-01-PLAN.md
-- [ ] 04-02-PLAN.md
-- [ ] 04-03-PLAN.md
-- [ ] 04-04-PLAN.md
-- [ ] 04-05-PLAN.md
+- [x] 04-02-PLAN.md
+- [x] 04-03-PLAN.md
+- [x] 04-04-PLAN.md
+- [x] 04-05-PLAN.md
 
 **Wave 1**
 
@@ -157,19 +157,19 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 04-02: Add manual draft generation and split detail-page presentation
+- [x] 04-02: Add manual draft generation and split detail-page presentation
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 04-03: Build draft edit/approve/unapprove workflow and retry stale marking
+- [x] 04-03: Build draft edit/approve/unapprove workflow and retry stale marking
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 04-04: Add global custom-instructions storage and management UI
+- [x] 04-04: Add global custom-instructions storage and management UI
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 04-05: Integrate saved custom instructions into future AI execution and retries
+- [x] 04-05: Integrate saved custom instructions into future AI execution and retries
 
 ### Phase 5: GitHub Comment Publishing
 
@@ -206,5 +206,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Review Run Foundation and Management UI | 4/4 | Complete | 2026-06-27 |
 | 2. GitHub PR Ingestion | 3/3 | Complete    | 2026-06-27 |
 | 3. Queued AI Review and Structured Findings | 5/5 | Complete    | 2026-06-28 |
-| 4. Draft Review and Custom Instructions | 1/5 | In Progress|  |
+| 4. Draft Review and Custom Instructions | 5/5 | Complete    | 2026-06-28 |
 | 5. GitHub Comment Publishing | 0/2 | Not started | - |

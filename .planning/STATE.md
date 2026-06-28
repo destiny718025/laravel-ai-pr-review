@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 04
-current_phase_name: Draft Review and Custom Instructions
-status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-06-28T11:14:21.743Z"
+current_phase: 05
+current_phase_name: GitHub Comment Publishing
+status: ready_for_planning
+stopped_at: Completed Phase 04
+last_updated: "2026-06-28T16:01:34Z"
 last_activity: 2026-06-28
-last_activity_desc: Phase 04 execution started
+last_activity_desc: Phase 04 execution completed
 progress:
   total_phases: 5
-  completed_phases: 3
-  total_plans: 17
-  completed_plans: 13
-  percent: 60
+  completed_phases: 4
+  total_plans: 19
+  completed_plans: 17
+  percent: 80
 ---
 
 # Project State
@@ -24,24 +24,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-26)
 
 **Core value:** Turn a GitHub PR URL into useful, reviewable AI findings and comment drafts that help catch bugs and security issues before code is merged.
-**Current focus:** Phase 04 — Draft Review and Custom Instructions
+**Current focus:** Phase 05 — GitHub Comment Publishing
 
 ## Current Position
 
-Phase: 04 (Draft Review and Custom Instructions) — EXECUTING
-Plan: 2 of 5
-Status: Ready to execute
-Last activity: 2026-06-28 — Phase 04 execution started
+Phase: 05 (GitHub Comment Publishing) — READY FOR PLANNING
+Plan: Not planned yet
+Status: Ready to plan Phase 05
+Last activity: 2026-06-28 — Phase 04 execution completed
 
-Progress: [██████░░░░] 60%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 12
-- Average duration: 22.5 min
-- Total execution time: 90 min
+- Total plans completed: 17
+- Average duration: 20.5 min
+- Total execution time: 174 min
 
 **By Phase:**
 
@@ -50,14 +50,18 @@ Progress: [██████░░░░] 60%
 | 01 | 4 | 90 min | 22.5 min |
 | 02 | 3 | - | - |
 | 03 | 5 | - | - |
-| 04 | 5 planned | - | - |
+| 04 | 5 | 84 min | 16.8 min |
 
 **Recent Trend:**
 
-- Last 5 plans: 04-01, 04-02, 04-03, 04-04, 04-05 planned
-- Trend: Phase 4 planning complete; Phase 4 is ready for execution
+- Last 5 plans: 04-01, 04-02, 04-03, 04-04, 04-05
+- Trend: Phase 4 completed; Phase 5 is ready for planning
 
 | Phase 04-draft-review-and-custom-instructions P01 | 6min | 2 tasks | 13 files |
+| Phase 04-draft-review-and-custom-instructions P02 | 18min | 2 tasks | 10 files |
+| Phase 04-draft-review-and-custom-instructions P03 | 27min | 2 tasks | 10 files |
+| Phase 04-draft-review-and-custom-instructions P04 | 20min | 2 tasks | 10 files |
+| Phase 04-draft-review-and-custom-instructions P05 | 13min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -73,6 +77,8 @@ Recent decisions affecting current work:
 - Defer GitHub webhook automation until after the manual workflow is stable
 - [Phase 04-draft-review-and-custom-instructions]: Retry now supersedes current findings instead of deleting them so draft provenance can survive future retries.
 - [Phase 04-draft-review-and-custom-instructions]: Comment drafts persist in a dedicated table with copied targeting metadata and enum-backed workflow status.
+- [Phase 04-draft-review-and-custom-instructions]: Drafts can be edited, approved locally, unapproved, and marked stale during successful retry without GitHub publication.
+- [Phase 04-draft-review-and-custom-instructions]: Global custom review instructions persist separately and are appended to future AI review requests at request-build time.
 
 ### Pending Todos
 
@@ -96,6 +102,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-28T11:13:00.051Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-06-28T16:01:34Z
+Stopped at: Completed Phase 04
 Resume file: None
