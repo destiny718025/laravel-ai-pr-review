@@ -7,6 +7,7 @@ use App\Data\AI\AIReviewRequest;
 use App\Models\ReviewRun;
 use App\Repositories\ReviewCommentDraftRepository;
 use App\Repositories\ReviewFindingRepository;
+use App\Repositories\ReviewInstructionSettingRepository;
 use App\Repositories\ReviewRunRepository;
 use App\Services\AI\AIReviewFailureMapper;
 use App\Services\AI\AIReviewPayloadValidator;
@@ -19,6 +20,7 @@ class ReviewExecutionService
         private readonly ReviewRunRepository $reviewRuns,
         private readonly ReviewFindingRepository $findings,
         private readonly ReviewCommentDraftRepository $drafts,
+        private readonly ReviewInstructionSettingRepository $instructionSettings,
         private readonly AIReviewProvider $provider,
         private readonly AIReviewPayloadValidator $validator,
         private readonly AIReviewFailureMapper $failureMapper,
@@ -77,7 +79,9 @@ class ReviewExecutionService
                 ])
                 ->values()
                 ->all(),
-            instructions: $this->instructionBuilder->buildDefault(),
+            instructions: $this->instructionBuilder->buildWithCustomInstructions(
+                $this->instructionSettings->findGlobal()?->custom_instructions,
+            ),
         );
     }
 }
