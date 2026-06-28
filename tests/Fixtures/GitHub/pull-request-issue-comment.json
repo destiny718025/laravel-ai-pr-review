@@ -1,0 +1,9 @@
+{
+  "id": 987654321,
+  "html_url": "https://github.com/laravel/framework/pull/1#issuecomment-987654321",
+  "created_at": "2026-06-29T01:02:03Z",
+  "body": "Fallback comment body that should not be persisted wholesale.",
+  "user": {
+    "login": "octocat"
+  }
+}
