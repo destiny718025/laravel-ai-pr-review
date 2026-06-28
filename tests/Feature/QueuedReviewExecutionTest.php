@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Contracts\AI\AIReviewProvider;
+use App\Data\AI\AIReviewRequest;
 use App\Data\GitHub\PullRequestFileSnapshot;
 use App\Data\GitHub\PullRequestSnapshot;
 use App\Enums\ReviewRunStatus;
@@ -161,6 +163,78 @@ class QueuedReviewExecutionTest extends TestCase
                 ->where('review_run_id', $reviewRun->id)
                 ->whereNull('stale_at')
                 ->count(),
+        );
+    }
+
+    public function test_future_execution_and_retry_requests_include_latest_saved_custom_instructions_without_rewriting_existing_artifacts(): void
+    {
+        $provider = new class implements AIReviewProvider
+        {
+            /**
+             * @var array<int, AIReviewRequest>
+             */
+            public array $requests = [];
+
+            public function review(AIReviewRequest $request): string
+            {
+                $this->requests[] = $request;
+
+                return (string) file_get_contents(base_path('tests/Fixtures/AI/fake-review-valid.json'));
+            }
+        };
+        $this->app->instance(AIReviewProvider::class, $provider);
+
+        $reviewRun = $this->createReviewRunWithSnapshot();
+
+        $this->from(route('reviews.show', $reviewRun))
+            ->put(route('review-instructions.update'), [
+                'custom_instructions' => 'Prioritize authorization bypasses in the first pass.',
+            ]);
+
+        app(ReviewRunRepository::class)->queueForExecution($reviewRun);
+        (new ExecuteReviewRunJob($reviewRun->id))->handle(app(ReviewExecutionService::class));
+
+        $this->assertStringContainsString(
+            'Prioritize authorization bypasses in the first pass.',
+            $provider->requests[0]->instructions,
+        );
+
+        $this->post(route('reviews.drafts.generate', $reviewRun));
+
+        $draft = ReviewCommentDraft::query()
+            ->where('review_run_id', $reviewRun->id)
+            ->firstOrFail();
+        $originalDraftUpdatedAt = $draft->updated_at;
+        $originalFindingCount = ReviewFinding::query()
+            ->where('review_run_id', $reviewRun->id)
+            ->count();
+
+        $this->from(route('reviews.show', $reviewRun))
+            ->put(route('review-instructions.update'), [
+                'custom_instructions' => 'For retries, focus on unsafe deserialization.',
+            ]);
+
+        $draft->refresh();
+
+        $this->assertTrue($originalDraftUpdatedAt->equalTo($draft->updated_at));
+        $this->assertNull($draft->stale_at);
+        $this->assertSame(
+            $originalFindingCount,
+            ReviewFinding::query()
+                ->where('review_run_id', $reviewRun->id)
+                ->count(),
+        );
+
+        app(ReviewRunRepository::class)->queueForExecution(ReviewRun::findOrFail($reviewRun->id));
+        (new ExecuteReviewRunJob($reviewRun->id))->handle(app(ReviewExecutionService::class));
+
+        $this->assertStringContainsString(
+            'For retries, focus on unsafe deserialization.',
+            $provider->requests[1]->instructions,
+        );
+        $this->assertStringNotContainsString(
+            'Prioritize authorization bypasses in the first pass.',
+            $provider->requests[1]->instructions,
         );
     }
 
