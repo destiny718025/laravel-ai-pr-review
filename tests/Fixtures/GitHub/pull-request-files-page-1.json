@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "1111111111111111111111111111111111111111",
+    "filename": "app/Services/GitHub/HttpGitHubClient.php",
+    "status": "added",
+    "additions": 40,
+    "deletions": 0,
+    "changes": 40,
+    "blob_url": "https://github.com/laravel/framework/blob/abc123def4567890abc123def4567890abc12345/app/Services/GitHub/HttpGitHubClient.php",
+    "raw_url": "https://github.com/laravel/framework/raw/abc123def4567890abc123def4567890abc12345/app/Services/GitHub/HttpGitHubClient.php",
+    "contents_url": "https://api.github.com/repos/laravel/framework/contents/app/Services/GitHub/HttpGitHubClient.php?ref=abc123def4567890abc123def4567890abc12345",
+    "patch": "@@ -0,0 +1,6 @@\n+<?php\n+\n+interface GitHubClient\n+{\n+    // ...\n+}\n"
+  },
+  {
+    "sha": "2222222222222222222222222222222222222222",
+    "filename": "app/Contracts/GitHub/GitHubClient.php",
+    "status": "added",
+    "additions": 12,
+    "deletions": 0,
+    "changes": 12,
+    "blob_url": "https://github.com/laravel/framework/blob/abc123def4567890abc123def4567890abc12345/app/Contracts/GitHub/GitHubClient.php",
+    "raw_url": "https://github.com/laravel/framework/raw/abc123def4567890abc123def4567890abc12345/app/Contracts/GitHub/GitHubClient.php",
+    "contents_url": "https://api.github.com/repos/laravel/framework/contents/app/Contracts/GitHub/GitHubClient.php?ref=abc123def4567890abc123def4567890abc12345",
+    "patch": "@@ -0,0 +1,5 @@\n+<?php\n+\n+namespace App\\Contracts\\GitHub;\n+\n+interface GitHubClient {}\n"
+  }
+]

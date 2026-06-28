@@ -12,7 +12,7 @@ The v1 roadmap builds a vertical MVP from a usable Laravel management interface 
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Review Run Foundation and Management UI** - User can submit PR URLs and see persisted review run status/history
-- [ ] **Phase 2: GitHub PR Ingestion** - System fetches PR metadata/files and stores comment-targeting diff metadata
+- [x] **Phase 2: GitHub PR Ingestion** - System fetches PR metadata/files and stores replayable diff snapshots (completed 2026-06-27)
 - [ ] **Phase 3: Queued AI Review and Structured Findings** - System executes review jobs through an AI provider interface and persists validated findings
 - [ ] **Phase 4: Draft Review and Custom Instructions** - User can inspect findings, edit drafts, approve drafts, and tune simple instructions
 - [ ] **Phase 5: GitHub Comment Publishing** - User can publish approved drafts to GitHub with per-draft status and error handling
@@ -67,17 +67,24 @@ Plans:
 **Success Criteria** (what must be TRUE):
 
   1. System can fetch PR metadata and changed files through a GitHub client interface.
-  2. System stores file path, line, side, and commit SHA metadata needed for future line-level comments.
+  2. System stores raw changed-file snapshots with filename, patch, file SHA, and PR head SHA so later phases can derive line-level comment targeting.
   3. GitHub failures mark the review run failed with a safe summarized error.
   4. Tests fake GitHub responses and do not call the real GitHub API.
 
 **Plans**: 3 plans
 
 Plans:
+**Wave 1**
 
-- [ ] 02-01: Add GitHub client interface, HTTP implementation, and fake/test fixtures
-- [ ] 02-02: Implement PR metadata/files ingestion and diff metadata persistence
-- [ ] 02-03: Add GitHub ingestion failure handling and tests
+- [x] 02-01: Add GitHub client interface, HTTP implementation, and fake/test fixtures
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 02-02: Implement PR metadata/files ingestion and diff metadata persistence
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [x] 02-03: Add GitHub ingestion failure handling and tests
 
 ### Phase 3: Queued AI Review and Structured Findings
 
@@ -157,7 +164,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Review Run Foundation and Management UI | 4/4 | Complete | 2026-06-27 |
-| 2. GitHub PR Ingestion | 0/3 | Not started | - |
+| 2. GitHub PR Ingestion | 3/3 | Complete    | 2026-06-27 |
 | 3. Queued AI Review and Structured Findings | 0/4 | Not started | - |
 | 4. Draft Review and Custom Instructions | 0/3 | Not started | - |
 | 5. GitHub Comment Publishing | 0/2 | Not started | - |
