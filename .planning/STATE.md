@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 4
+current_phase: 04
 current_phase_name: Draft Review and Custom Instructions
-status: ready_to_execute
-stopped_at: Phase 4 ready to execute
-last_updated: "2026-06-28T10:49:35Z"
+status: executing
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-06-28T11:14:21.743Z"
 last_activity: 2026-06-28
-last_activity_desc: Phase 04 planned and ready to execute
+last_activity_desc: Phase 04 execution started
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 17
-  completed_plans: 12
+  completed_plans: 13
   percent: 60
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-26)
 
 **Core value:** Turn a GitHub PR URL into useful, reviewable AI findings and comment drafts that help catch bugs and security issues before code is merged.
-**Current focus:** Phase 4 — Draft Review and Custom Instructions
+**Current focus:** Phase 04 — Draft Review and Custom Instructions
 
 ## Current Position
 
-Phase: 4 — Draft Review and Custom Instructions
-Plan: 04-01 ready
-Status: Ready to execute Phase 4
-Last activity: 2026-06-28 — Phase 04 planned and ready to execute
+Phase: 04 (Draft Review and Custom Instructions) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-06-28 — Phase 04 execution started
 
 Progress: [██████░░░░] 60%
 
@@ -57,6 +57,8 @@ Progress: [██████░░░░] 60%
 - Last 5 plans: 04-01, 04-02, 04-03, 04-04, 04-05 planned
 - Trend: Phase 4 planning complete; Phase 4 is ready for execution
 
+| Phase 04-draft-review-and-custom-instructions P01 | 6min | 2 tasks | 13 files |
+
 ## Accumulated Context
 
 ### Decisions
@@ -69,6 +71,8 @@ Recent decisions affecting current work:
 - Keep AI provider access behind an interface
 - Generate comment drafts first and require manual approval before posting
 - Defer GitHub webhook automation until after the manual workflow is stable
+- [Phase 04-draft-review-and-custom-instructions]: Retry now supersedes current findings instead of deleting them so draft provenance can survive future retries.
+- [Phase 04-draft-review-and-custom-instructions]: Comment drafts persist in a dedicated table with copied targeting metadata and enum-backed workflow status.
 
 ### Pending Todos
 
@@ -92,6 +96,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-28T10:49:35Z
-Stopped at: Phase 4 ready to execute
-Resume file: .planning/STATE.md
+Last session: 2026-06-28T11:13:00.051Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None

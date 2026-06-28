@@ -55,13 +55,13 @@ Requirements for the initial personal-use MVP. Each requirement is testable and 
 
 ### Findings and Comment Drafts
 
-- [ ] **DRAFT-01**: System persists structured review findings for a completed review run
+- [x] **DRAFT-01**: System persists structured review findings for a completed review run
 - [ ] **DRAFT-02**: System creates comment drafts from AI findings instead of posting comments automatically
 - [ ] **DRAFT-03**: User can view findings and comment drafts on the review run detail page
 - [ ] **DRAFT-04**: User can edit a comment draft before approving it
 - [ ] **DRAFT-05**: User can approve one or more comment drafts for publication
-- [ ] **DRAFT-06**: Comment drafts track publication status such as draft, approved, posted, and failed
-- [ ] **DRAFT-07**: Comment drafts retain GitHub comment targeting metadata needed for line-level publication when available
+- [x] **DRAFT-06**: Comment drafts track publication status such as draft, approved, posted, and failed
+- [x] **DRAFT-07**: Comment drafts retain GitHub comment targeting metadata needed for line-level publication when available
 
 ### Custom Review Instructions
 
@@ -164,13 +164,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AI-06 | Phase 3 | Complete |
 | AI-07 | Phase 3 | Complete |
 | AI-08 | Phase 3 | Complete |
-| DRAFT-01 | Phase 4 | Pending |
+| DRAFT-01 | Phase 4 | Complete |
 | DRAFT-02 | Phase 4 | Pending |
 | DRAFT-03 | Phase 4 | Pending |
 | DRAFT-04 | Phase 4 | Pending |
 | DRAFT-05 | Phase 4 | Pending |
-| DRAFT-06 | Phase 4 | Pending |
-| DRAFT-07 | Phase 4 | Pending |
+| DRAFT-06 | Phase 4 | Complete |
+| DRAFT-07 | Phase 4 | Complete |
 | RULE-01 | Phase 4 | Pending |
 | RULE-02 | Phase 4 | Pending |
 | RULE-03 | Phase 4 | Pending |

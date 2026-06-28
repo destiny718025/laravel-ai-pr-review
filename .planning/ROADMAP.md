@@ -141,12 +141,19 @@ Plans:
   4. Drafts track draft/approved/posted/failed state and retain GitHub targeting metadata.
   5. User can edit custom review instructions and future AI reviews include them.
 
-**Plans**: 5 plans
+**Plans**: 1/5 plans executed
 
 Plans:
+
+- [x] 04-01-PLAN.md
+- [ ] 04-02-PLAN.md
+- [ ] 04-03-PLAN.md
+- [ ] 04-04-PLAN.md
+- [ ] 04-05-PLAN.md
+
 **Wave 1**
 
-- [ ] 04-01: Add draft persistence foundation and superseded-finding provenance
+- [x] 04-01: Add draft persistence foundation and superseded-finding provenance
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -199,5 +206,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 1. Review Run Foundation and Management UI | 4/4 | Complete | 2026-06-27 |
 | 2. GitHub PR Ingestion | 3/3 | Complete    | 2026-06-27 |
 | 3. Queued AI Review and Structured Findings | 5/5 | Complete    | 2026-06-28 |
-| 4. Draft Review and Custom Instructions | 0/5 | Not started | - |
+| 4. Draft Review and Custom Instructions | 1/5 | In Progress|  |
 | 5. GitHub Comment Publishing | 0/2 | Not started | - |
