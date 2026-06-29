@@ -6,15 +6,15 @@ current_phase: 05
 current_phase_name: GitHub Comment Publishing
 status: executing
 stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-06-28T23:36:54.882Z"
+last_updated: "2026-06-29T03:01:53.207Z"
 last_activity: 2026-06-28
 last_activity_desc: Phase 05 execution started
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 20
-  completed_plans: 18
-  percent: 90
+  completed_plans: 19
+  percent: 80
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-26)
 ## Current Position
 
 Phase: 05 (GitHub Comment Publishing) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-06-28 — Phase 05 execution started
 
@@ -63,6 +63,7 @@ Progress: [█████████░] 90%
 | Phase 04-draft-review-and-custom-instructions P04 | 20min | 2 tasks | 10 files |
 | Phase 04-draft-review-and-custom-instructions P05 | 13min | 2 tasks | 4 files |
 | Phase 05 P01 | 3min | 2 tasks | 9 files |
+| Phase 05 P02 | 3min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,9 @@ Recent decisions affecting current work:
 - [Phase 04-draft-review-and-custom-instructions]: Global custom review instructions persist separately and are appended to future AI review requests at request-build time.
 - [Phase 05]: GitHub publication now uses dedicated target/result DTOs with only id, htmlUrl, and postedAt.
 - [Phase 05]: GitHubFailureMapper now exposes publication-safe mapping separately from fetch-safe mapping.
+- [Phase 05]: Publish and retry remain separate service entry points so draft status filtering stays explicit.
+- [Phase 05]: Line-level publication is attempted only when local target metadata is sufficient; otherwise the workflow falls back to one issue comment per draft.
+- [Phase 05]: Draft publication persistence stores only one safe local outcome at a time by clearing stale failure fields on success and stale GitHub fields on failure.
 
 ### Pending Todos
 
@@ -105,6 +109,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-28T23:36:54.877Z
+Last session: 2026-06-29T03:01:13.273Z
 Stopped at: Completed 05-01-PLAN.md
 Resume file: None
