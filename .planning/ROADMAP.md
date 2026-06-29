@@ -15,7 +15,7 @@ The v1 roadmap builds a vertical MVP from a usable Laravel management interface 
 - [x] **Phase 2: GitHub PR Ingestion** - System fetches PR metadata/files and stores replayable diff snapshots (completed 2026-06-27)
 - [x] **Phase 3: Queued AI Review and Structured Findings** - System executes review jobs through an AI provider interface and persists validated findings (completed 2026-06-28)
 - [x] **Phase 4: Draft Review and Custom Instructions** - User can inspect findings, edit drafts, approve drafts, and tune simple instructions (completed 2026-06-28)
-- [ ] **Phase 5: GitHub Comment Publishing** - User can publish approved drafts to GitHub with per-draft status and error handling
+- [x] **Phase 5: GitHub Comment Publishing** - User can publish approved drafts to GitHub with per-draft status and error handling (completed 2026-06-29)
 
 ## Phase Details
 
@@ -185,13 +185,13 @@ Plans:
   4. Failed publication shows a safe summarized error.
   5. The system never posts AI-generated comments without explicit user approval.
 
-**Plans**: 2/3 plans executed
+**Plans**: 3/3 plans complete
 
 Plans:
 
 - [x] 05-01-PLAN.md
 - [x] 05-02-PLAN.md
-- [ ] 05-03-PLAN.md
+- [x] 05-03-PLAN.md
 
 **Wave 1**
 
@@ -199,11 +199,11 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 05-02: Implement approved-draft publication service and per-draft persistence
+- [x] 05-02: Implement approved-draft publication service and per-draft persistence
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 05-03: Add publish UI, per-draft status handling, and fake GitHub publication tests
+- [x] 05-03: Add publish UI, per-draft status handling, and fake GitHub publication tests
 
 ## Future Direction
 
@@ -220,4 +220,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. GitHub PR Ingestion | 3/3 | Complete    | 2026-06-27 |
 | 3. Queued AI Review and Structured Findings | 5/5 | Complete    | 2026-06-28 |
 | 4. Draft Review and Custom Instructions | 5/5 | Complete    | 2026-06-28 |
-| 5. GitHub Comment Publishing | 2/3 | In Progress|  |
+| 5. GitHub Comment Publishing | 3/3 | Complete   | 2026-06-29 |

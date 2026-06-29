@@ -72,7 +72,7 @@ Requirements for the initial personal-use MVP. Each requirement is testable and 
 
 ### GitHub Comment Publishing
 
-- [ ] **PUB-01**: User can publish approved comment drafts to GitHub
+- [x] **PUB-01**: User can publish approved comment drafts to GitHub
 - [x] **PUB-02**: System publishes comments through a GitHub client interface
 - [x] **PUB-03**: System records successful GitHub publication on each published draft
 - [x] **PUB-04**: System records failed GitHub publication on each failed draft with a safe summarized error
@@ -175,7 +175,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RULE-02 | Phase 4 | Pending |
 | RULE-03 | Phase 4 | Pending |
 | RULE-04 | Phase 4 | Pending |
-| PUB-01 | Phase 5 | Pending |
+| PUB-01 | Phase 5 | Complete |
 | PUB-02 | Phase 5 | Complete |
 | PUB-03 | Phase 5 | Complete |
 | PUB-04 | Phase 5 | Complete |
