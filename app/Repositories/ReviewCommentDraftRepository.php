@@ -2,6 +2,8 @@
 
 namespace App\Repositories;
 
+use App\Data\GitHub\GitHubCommentPublicationResult;
+use App\Data\GitHub\GitHubFailure;
 use App\Enums\ReviewCommentDraftStatus;
 use App\Models\ReviewCommentDraft;
 use App\Models\ReviewFinding;
@@ -98,6 +100,58 @@ class ReviewCommentDraftRepository
     public function markDraft(ReviewCommentDraft $draft): ReviewCommentDraft
     {
         $draft->forceFill(['status' => ReviewCommentDraftStatus::Draft])->save();
+
+        return $draft->refresh();
+    }
+
+    /**
+     * @return Collection<int, ReviewCommentDraft>
+     */
+    public function approvedForReviewRun(ReviewRun $reviewRun): Collection
+    {
+        return ReviewCommentDraft::query()
+            ->where('review_run_id', $reviewRun->id)
+            ->where('status', ReviewCommentDraftStatus::Approved)
+            ->orderBy('id')
+            ->get();
+    }
+
+    /**
+     * @return Collection<int, ReviewCommentDraft>
+     */
+    public function failedForReviewRun(ReviewRun $reviewRun): Collection
+    {
+        return ReviewCommentDraft::query()
+            ->where('review_run_id', $reviewRun->id)
+            ->where('status', ReviewCommentDraftStatus::Failed)
+            ->orderBy('id')
+            ->get();
+    }
+
+    public function markPosted(ReviewCommentDraft $draft, GitHubCommentPublicationResult $result): ReviewCommentDraft
+    {
+        $draft->forceFill([
+            'status' => ReviewCommentDraftStatus::Posted,
+            'github_comment_id' => $result->id,
+            'github_comment_html_url' => $result->htmlUrl,
+            'posted_at' => $result->postedAt,
+            'publication_error_code' => null,
+            'publication_error_message' => null,
+        ])->save();
+
+        return $draft->refresh();
+    }
+
+    public function markPublicationFailed(ReviewCommentDraft $draft, GitHubFailure $failure): ReviewCommentDraft
+    {
+        $draft->forceFill([
+            'status' => ReviewCommentDraftStatus::Failed,
+            'github_comment_id' => null,
+            'github_comment_html_url' => null,
+            'posted_at' => null,
+            'publication_error_code' => $failure->code,
+            'publication_error_message' => $failure->message,
+        ])->save();
 
         return $draft->refresh();
     }

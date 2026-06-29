@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Contracts\GitHub\GitHubClient;
 use App\Data\GitHub\GitHubCommentPublicationResult;
 use App\Data\GitHub\GitHubCommentPublicationTarget;
+use App\Data\GitHub\PullRequestSnapshot;
 use App\Enums\ReviewCommentDraftStatus;
 use App\Models\GitHubRepository;
 use App\Models\PullRequest;
@@ -273,7 +274,7 @@ class FakePublishingGitHubClient implements GitHubClient
      */
     public array $issueCommentFailures = [];
 
-    public function getPullRequest(string $owner, string $repository, int $pullRequestNumber): \App\Data\GitHub\PullRequestSnapshot
+    public function getPullRequest(string $owner, string $repository, int $pullRequestNumber): PullRequestSnapshot
     {
         throw new \BadMethodCallException('Not used in this test.');
     }

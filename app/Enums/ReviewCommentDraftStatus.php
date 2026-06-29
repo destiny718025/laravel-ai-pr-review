@@ -18,4 +18,14 @@ enum ReviewCommentDraftStatus: string
     {
         return $this === self::Approved;
     }
+
+    public function isPosted(): bool
+    {
+        return $this === self::Posted;
+    }
+
+    public function isFailed(): bool
+    {
+        return $this === self::Failed;
+    }
 }

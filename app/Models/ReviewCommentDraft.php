@@ -17,6 +17,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'line_reference',
     'github_head_sha',
     'source_file_sha',
+    'github_comment_id',
+    'github_comment_html_url',
+    'posted_at',
+    'publication_error_code',
+    'publication_error_message',
     'stale_at',
 ])]
 class ReviewCommentDraft extends Model
@@ -48,7 +53,27 @@ class ReviewCommentDraft extends Model
     {
         return [
             'status' => ReviewCommentDraftStatus::class,
+            'posted_at' => 'datetime',
             'stale_at' => 'datetime',
         ];
+    }
+
+    public function hasSufficientLineLevelTarget(): bool
+    {
+        return $this->body !== ''
+            && $this->file_path !== ''
+            && $this->github_head_sha !== ''
+            && $this->lineNumber() !== null;
+    }
+
+    public function lineNumber(): ?int
+    {
+        if ($this->line_reference === null || $this->line_reference === '') {
+            return null;
+        }
+
+        $line = filter_var($this->line_reference, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+
+        return $line === false ? null : $line;
     }
 }
