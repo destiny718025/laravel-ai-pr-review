@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 05
-current_phase_name: GitHub Comment Publishing
-status: complete
-stopped_at: Phase 06 context gathered
-last_updated: "2026-06-29T08:09:46.689Z"
+current_phase: 06
+current_phase_name: OpenAI Codex OAuth AI Provider
+status: planned
+stopped_at: Phase 06 planned
+last_updated: "2026-06-29T13:20:07Z"
 last_activity: 2026-06-29
-last_activity_desc: Phase 05 verified and complete
+last_activity_desc: Phase 06 planned with 3 executable plans
 progress:
   total_phases: 6
   completed_phases: 5
-  total_plans: 20
+  total_plans: 23
   completed_plans: 20
-  percent: 83
+  percent: 87
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-26)
 
 **Core value:** Turn a GitHub PR URL into useful, reviewable AI findings and comment drafts that help catch bugs and security issues before code is merged.
-**Current focus:** v1 MVP complete — ready for milestone summary or next milestone planning
+**Current focus:** Phase 06 planned — ready to execute OpenAI Codex OAuth provider integration
 
 ## Current Position
 
-Phase: 05 (GitHub Comment Publishing) — COMPLETE
-Plan: 3 of 3
-Status: Phase 05 verified; v1 MVP milestone implementation is complete
-Last activity: 2026-06-29 — Phase 05 verified and complete
+Phase: 06 (OpenAI Codex OAuth AI Provider) — PLANNED
+Plan: 0 of 3
+Status: Phase 06 planning complete; ready for `$gsd-execute-phase 06`
+Last activity: 2026-06-29 — Phase 06 planned with 3 executable plans
 
-Progress: [██████████] 100%
+Progress: [████████░░] 87%
 
 ## Performance Metrics
 
@@ -55,8 +55,8 @@ Progress: [██████████] 100%
 
 **Recent Trend:**
 
-- Last 5 plans: 04-04, 04-05, 05-01, 05-02, 05-03
-- Trend: Phase 5 completed and verified; v1 MVP is ready for milestone summary or next milestone planning
+- Last 5 completed plans: 04-04, 04-05, 05-01, 05-02, 05-03
+- Trend: Phase 5 completed and verified; Phase 6 planning is ready for execution
 
 | Phase 04-draft-review-and-custom-instructions P01 | 6min | 2 tasks | 13 files |
 | Phase 04-draft-review-and-custom-instructions P02 | 18min | 2 tasks | 10 files |
@@ -98,7 +98,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- AI provider choice remains open until implementation planning
+- Phase 06 execution will add the explicit `openai_codex_oauth` provider path and keep fake/API-key providers distinct
 - Private repo auth model should start simple and be revisited before webhook/team work
 - GitHub ingestion starts public-only and needs focused fake-client tests before any real API dependency
 - GitHub diff-to-comment mapping is deferred beyond Phase 2; Phase 2 stores filename, patch, and sha only
@@ -115,5 +115,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-06-29T08:09:46.679Z
-Stopped at: Phase 06 context gathered
-Resume file: .planning/phases/06-openai-codex-oauth-ai-provider/06-CONTEXT.md
+Stopped at: Phase 06 planned
+Resume file: .planning/phases/06-openai-codex-oauth-ai-provider/06-01-PLAN.md

@@ -264,9 +264,19 @@ final readonly class CodexAuthCredentials
 ```php
 <?php
 
-// Source: app/Services/AI/HttpOpenAIReviewProvider.php
-$text = data_get($response, 'output.0.content.0.text')
-    ?? data_get($response, 'choices.0.message.content');
+// Source: Phase 06 target pattern, adapted from the existing provider-local extraction boundary.
+$text = null;
+
+foreach ((array) data_get($response, 'output', []) as $item) {
+    foreach ((array) data_get($item, 'content', []) as $part) {
+        if (in_array(data_get($part, 'type'), ['output_text', 'text'], true) && is_string(data_get($part, 'text'))) {
+            $text = data_get($part, 'text');
+            break 2;
+        }
+    }
+}
+
+$text ??= is_string(data_get($response, 'output_text')) ? data_get($response, 'output_text') : null;
 
 if (! is_string($text) || $text === '') {
     throw new UnexpectedValueException('Provider response did not include review JSON text.');
@@ -380,10 +390,19 @@ private function resolveCodexAuthPath(): string
 ```php
 <?php
 
-// Source: app/Services/AI/HttpOpenAIReviewProvider.php
-$text = data_get($response, 'output.0.content.0.text')
-    ?? data_get($response, 'output_text')
-    ?? data_get($response, 'choices.0.message.content');
+// Source: Phase 06 target pattern, adapted from OpenAI Responses object text parts.
+$text = null;
+
+foreach ((array) data_get($response, 'output', []) as $item) {
+    foreach ((array) data_get($item, 'content', []) as $part) {
+        if (in_array(data_get($part, 'type'), ['output_text', 'text'], true) && is_string(data_get($part, 'text'))) {
+            $text = data_get($part, 'text');
+            break 2;
+        }
+    }
+}
+
+$text ??= is_string(data_get($response, 'output_text')) ? data_get($response, 'output_text') : null;
 
 if (! is_string($text) || $text === '') {
     throw new UnexpectedValueException('Codex response did not include review JSON text.');
@@ -409,21 +428,22 @@ return $text;
 
 | # | Claim | Section | Risk if Wrong |
 |---|-------|---------|---------------|
-| A1 | The Codex `/responses` success body for this text-review workflow can probably be normalized from `output.0.content.0.text`, `output_text`, or a similar Responses-style text field. [ASSUMED] | Summary, Pattern 3, Code Examples | If the body shape differs materially, every successful HTTP call could still fail as invalid provider output until the parser is updated. |
-| A2 | `ChatGPT-Account-ID` may be optional for the actual inference request even though OpenClaw sends it for model discovery. [ASSUMED] | Open Questions, Common Pitfalls | If the header is required for inference too, provider calls may return 401/403 until the header is added from `tokens.account_id`. |
+| A1 | RESOLVED: Phase 06 will treat OpenAI Responses-style `output[].content[]` parts with `type` of `output_text` or `text` as the primary success body contract, with `output_text` as a compatibility fallback. [VERIFIED: https://platform.openai.com/docs/api-reference/responses/object] [VERIFIED: /private/tmp/hermes-agent/agent/codex_responses_adapter.py] | Summary, Pattern 3, Code Examples | If the unofficial Codex backend drifts from the Responses object shape, provider tests should fail closed as unsupported response shape rather than persisting malformed findings. |
+| A2 | RESOLVED: Phase 06 will send `ChatGPT-Account-ID` when an account id is available from the Codex auth cache/credential DTO; if unavailable, the provider will omit it without crashing and let the backend return a mapped auth failure. [VERIFIED: /private/tmp/hermes-agent/agent/auxiliary_client.py] [VERIFIED: local Codex auth cache] | Open Questions (RESOLVED), Common Pitfalls | If a future backend requires the header in all cases, missing account id will produce a safe 401/403 failure instead of fallback or secret leakage. |
 | A3 | A small management-page availability indicator is optional rather than required for safe operation in Phase 06. [ASSUMED] | Architectural Responsibility Map | If the user expects UI visibility, the plan may miss a small but important UX task. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **What is the exact successful response body shape for `POST https://chatgpt.com/backend-api/codex/responses` in this PR-review use case?**
-   - What we know: OpenClaw routes Codex-backed work to `/responses`, and the current app already knows how to extract text from standard OpenAI Responses-style bodies. [VERIFIED: /private/tmp/openclaw-openclaw/extensions/openai/image-generation-provider.ts] [VERIFIED: app/Services/AI/HttpOpenAIReviewProvider.php]
-   - What's unclear: The exact text field for a non-streamed PR-review response from the unofficial Codex backend is not documented in the sources reviewed here. [ASSUMED]
-   - Recommendation: Plan one exploratory provider test with a fake response body contract and keep the parser narrowly extensible rather than scattering response-shape logic. [VERIFIED: tests/Unit/AI/OpenAIReviewProviderTest.php] [ASSUMED]
+   - Resolution: Phase 06 will use the standard OpenAI Responses object shape as the contract: read assistant message content from `output[].content[]` entries whose `type` is `output_text` or `text`, then return the first non-empty `text` value. [VERIFIED: https://platform.openai.com/docs/api-reference/responses/object]
+   - Compatibility fallback: If `output[].content[]` has no text, check top-level `output_text`, because Hermes normalizes final text from that field when Responses content parts are empty. [VERIFIED: /private/tmp/hermes-agent/agent/codex_responses_adapter.py]
+   - Explicit non-goal: Do not scatter Codex response parsing through queued execution. The Codex provider owns extraction and must throw a safe unsupported-response exception when neither contract yields review JSON text. [VERIFIED: app/Services/AI/HttpOpenAIReviewProvider.php] [VERIFIED: app/Services/ReviewExecutionService.php]
+   - Planning impact: Update provider tests to fake a Responses object with `output: [{ type: "message", content: [{ type: "output_text", text: "{...}" }] }]`, plus a fallback `output_text` case and unsupported-shape failure case.
 
 2. **Is `tokens.account_id` or `ChatGPT-Account-ID` required for inference requests, or only for model discovery/catalog calls?**
-   - What we know: The local auth cache currently contains `tokens.account_id`, and OpenClaw sends `ChatGPT-Account-ID` during Codex model discovery. [VERIFIED: local Codex auth cache] [VERIFIED: /private/tmp/openclaw-openclaw/extensions/openai/openai-provider.ts]
-   - What's unclear: The reviewed sources do not prove the header is required on normal `/responses` review calls. [ASSUMED]
-   - Recommendation: Plan the credential DTO to carry `account_id` if present so the provider can add the header without schema churn if needed. [VERIFIED: local Codex auth cache] [ASSUMED]
+   - Resolution: Phase 06 will treat `ChatGPT-Account-ID` as part of the best-effort Codex request header contract when account id is available. Hermes extracts `chatgpt_account_id` from the OAuth JWT and sends the canonical `ChatGPT-Account-ID` header for Codex backend requests; the local cache also exposes an account id field. [VERIFIED: /private/tmp/hermes-agent/agent/auxiliary_client.py] [VERIFIED: local Codex auth cache]
+   - Failure behavior: Missing or unparsable account id must not crash, must not trigger API-key fallback, and must not expose token contents. The provider may omit the header, and 401/403 responses are mapped to a safe unauthorized Codex failure. [VERIFIED: /private/tmp/hermes-agent/agent/auxiliary_client.py] [VERIFIED: .planning/phases/06-openai-codex-oauth-ai-provider/06-CONTEXT.md]
+   - Planning impact: Keep `accountId` optional on `CodexAuthCredentials`, assert `ChatGPT-Account-ID` is sent when present, and assert no header/body/token leakage when authorization fails.
 
 3. **Should Phase 06 expose a safe UI status indicator for Codex auth availability?**
    - What we know: The context leaves this as planner discretion, and a full provider-management UI is explicitly out of scope. [VERIFIED: .planning/phases/06-openai-codex-oauth-ai-provider/06-CONTEXT.md]
@@ -529,7 +549,7 @@ return $text;
 **Confidence breakdown:**
 
 - Standard stack: HIGH - The repo versions, container runtime, and existing Laravel seams were verified locally. [VERIFIED: docker exec] [VERIFIED: codebase]
-- Architecture: MEDIUM - The Laravel integration points are clear, but the exact successful Codex `/responses` body for this workload remains unverified from official documentation. [VERIFIED: codebase] [VERIFIED: /private/tmp/openclaw-openclaw] [ASSUMED]
+- Architecture: MEDIUM - The Laravel integration points are clear and the Phase 06 success parser now targets the official Responses object text-part shape, while the Codex backend itself remains an unofficial transport surface that should fail closed on shape drift. [VERIFIED: codebase] [VERIFIED: https://platform.openai.com/docs/api-reference/responses/object] [VERIFIED: /private/tmp/openclaw-openclaw] [VERIFIED: /private/tmp/hermes-agent]
 - Pitfalls: HIGH - The key risks were cross-checked against official Codex docs, local cache shape, and two separate reference implementations. [CITED: https://developers.openai.com/codex/auth] [VERIFIED: local Codex auth cache] [VERIFIED: /private/tmp/openclaw-openclaw] [VERIFIED: /private/tmp/hermes-agent]
 
 **Research date:** 2026-06-29
