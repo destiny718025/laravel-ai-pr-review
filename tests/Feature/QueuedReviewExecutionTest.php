@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Contracts\AI\AIReviewProvider;
 use App\Data\AI\AIReviewRequest;
+use App\Data\AI\CodexAuthCredentials;
 use App\Data\GitHub\PullRequestFileSnapshot;
 use App\Data\GitHub\PullRequestSnapshot;
 use App\Enums\ReviewRunStatus;
@@ -12,9 +13,11 @@ use App\Models\ReviewCommentDraft;
 use App\Models\ReviewFinding;
 use App\Models\ReviewRun;
 use App\Repositories\ReviewRunRepository;
+use App\Services\AI\CodexAuthCacheReader;
 use App\Services\ReviewExecutionService;
 use App\Services\ReviewRunService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
@@ -58,6 +61,88 @@ class QueuedReviewExecutionTest extends TestCase
             'category' => 'security',
             'suggested_comment_text' => 'Please map provider exceptions to safe summaries before storing or rendering them.',
         ]);
+    }
+
+    public function test_openai_codex_oauth_selector_runs_through_queued_execution_and_persists_validated_findings(): void
+    {
+        Queue::fake();
+
+        config([
+            'services.ai.provider' => 'openai_codex_oauth',
+            'services.codex.base_url' => 'https://chatgpt.test/backend-api/codex',
+            'services.codex.timeout' => 7,
+            'services.openai.base_url' => 'https://api.openai.test',
+            'services.openai.api_key' => 'sk-openai-should-not-be-used',
+            'services.openai.model' => 'gpt-test',
+        ]);
+
+        $this->fakeCodexCredentials('codex-access-token', 'acct-123');
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response([
+                'output' => [
+                    [
+                        'type' => 'message',
+                        'content' => [
+                            [
+                                'type' => 'output_text',
+                                'text' => <<<'JSON'
+{"findings":[{"severity":"high","category":"bug","file_path":"app/Services/GitHub/HttpGitHubClient.php","line_reference":"24","title":"Queued Codex success path","rationale":"Codex responses must still flow through the shared validator before persistence.","suggested_comment_text":"Keep the queued execution boundary provider-agnostic so provider output stays validated."},{"severity":"medium","category":"security","file_path":"app/Contracts/GitHub/GitHubClient.php","line_reference":"11","title":"Secret-free persistence","rationale":"Safe failure handling must not persist auth cache or backend payload fragments.","suggested_comment_text":"Persist only mapped safe summaries when provider execution fails."}]}
+JSON,
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+            'https://api.openai.test/*' => Http::response(['should_not' => 'be_used']),
+        ]);
+
+        $reviewRun = $this->createReviewRunWithSnapshot();
+
+        $this->post(route('reviews.run', $reviewRun))
+            ->assertRedirect(route('reviews.show', $reviewRun))
+            ->assertSessionHas('status', 'AI review queued.');
+
+        (new ExecuteReviewRunJob($reviewRun->id))->handle(app(ReviewExecutionService::class));
+
+        $reviewRun = ReviewRun::query()->with('findings')->findOrFail($reviewRun->id);
+
+        $this->assertSame(ReviewRunStatus::Completed, $reviewRun->status);
+        $this->assertNull($reviewRun->safe_error_message);
+        $this->assertCount(2, $reviewRun->findings);
+        $this->assertDatabaseHas('review_findings', [
+            'review_run_id' => $reviewRun->id,
+            'title' => 'Queued Codex success path',
+            'severity' => 'high',
+            'category' => 'bug',
+        ]);
+        $this->assertDatabaseHas('review_findings', [
+            'review_run_id' => $reviewRun->id,
+            'title' => 'Secret-free persistence',
+            'severity' => 'medium',
+            'category' => 'security',
+        ]);
+
+        Http::assertSent(function ($request): bool {
+            $payload = $request->data();
+            $reviewInput = json_decode((string) $payload['input'][1]['content'], true, 512, JSON_THROW_ON_ERROR);
+
+            return $request->url() === 'https://chatgpt.test/backend-api/codex/responses'
+                && $request->method() === 'POST'
+                && $request->hasHeader('Authorization', 'Bearer codex-access-token')
+                && $request->hasHeader('ChatGPT-Account-ID', 'acct-123')
+                && $payload['input'][0]['role'] === 'system'
+                && is_string($payload['input'][0]['content'])
+                && str_contains($payload['input'][0]['content'], 'bug')
+                && $reviewInput['repository'] === 'laravel/framework'
+                && $reviewInput['pull_request_number'] === 1
+                && $reviewInput['source_url'] === 'https://github.com/laravel/framework/pull/1'
+                && $reviewInput['head_sha'] === 'abc123def4567890abc123def4567890abc12345'
+                && $reviewInput['title'] === 'Add queued AI review'
+                && count($reviewInput['files']) === 2;
+        });
+        Http::assertSentCount(1);
     }
 
     public function test_review_detail_renders_structured_findings_and_local_draft_generation_without_publish_controls(): void
@@ -264,5 +349,26 @@ class QueuedReviewExecutionTest extends TestCase
                 ),
             ],
         );
+    }
+
+    private function fakeCodexCredentials(string $accessToken, ?string $accountId = null): void
+    {
+        $this->app->instance(CodexAuthCacheReader::class, new class($accessToken, $accountId) extends CodexAuthCacheReader
+        {
+            public function __construct(
+                private readonly string $accessToken,
+                private readonly ?string $accountId,
+            ) {}
+
+            public function read(): CodexAuthCredentials
+            {
+                return new CodexAuthCredentials(
+                    accessToken: $this->accessToken,
+                    accountId: $this->accountId,
+                    authMode: 'chatgpt',
+                    lastRefresh: '2026-06-30T00:00:00Z',
+                );
+            }
+        });
     }
 }
