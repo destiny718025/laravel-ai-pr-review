@@ -227,12 +227,12 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 **Goal:** Let queued AI review use an explicit Codex OAuth provider path backed by local Codex CLI auth cache without storing tokens or silently falling back to the API-key route.
 **Requirements**: [ARCH-01, ARCH-03, ARCH-05, AI-03, AI-04, AI-08, EXEC-04, EXEC-05]
 **Depends on:** Phase 5
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 
 - [x] 06-01-PLAN.md — Add explicit provider selection and a fakeable Codex auth-cache reader
-- [ ] 06-02-PLAN.md — Add the Codex OAuth HTTP provider and categorized safe failure mapping
+- [x] 06-02-PLAN.md — Add the Codex OAuth HTTP provider and categorized safe failure mapping
 - [ ] 06-03-PLAN.md — Harden queued execution integration and run the full offline phase gate
 
 **Wave 1**
@@ -241,7 +241,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 06-02: Add the Codex OAuth HTTP provider and categorized safe failure mapping
+- [x] 06-02: Add the Codex OAuth HTTP provider and categorized safe failure mapping
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
