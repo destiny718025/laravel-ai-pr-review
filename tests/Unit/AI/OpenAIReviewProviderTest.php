@@ -5,6 +5,7 @@ namespace Tests\Unit\AI;
 use App\Contracts\AI\AIReviewProvider;
 use App\Data\AI\AIReviewRequest;
 use App\Services\AI\FakeAIReviewProvider;
+use App\Services\AI\HttpOpenAICodexOAuthReviewProvider;
 use App\Services\AI\HttpOpenAIReviewProvider;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
@@ -42,14 +43,11 @@ class OpenAIReviewProviderTest extends TestCase
         app(AIReviewProvider::class);
     }
 
-    public function test_openai_codex_oauth_selector_fails_closed_until_the_transport_is_installed(): void
+    public function test_openai_codex_oauth_provider_resolves_when_selector_requests_it(): void
     {
         config(['services.ai.provider' => 'openai_codex_oauth']);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('openai_codex_oauth provider is not available');
-
-        app(AIReviewProvider::class);
+        $this->assertInstanceOf(HttpOpenAICodexOAuthReviewProvider::class, app(AIReviewProvider::class));
     }
 
     public function test_openai_provider_sends_http_fakeable_request_and_returns_raw_json_text(): void
