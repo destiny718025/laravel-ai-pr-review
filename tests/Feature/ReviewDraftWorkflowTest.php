@@ -50,6 +50,47 @@ class ReviewDraftWorkflowTest extends TestCase
         ]);
     }
 
+    public function test_posted_draft_rejects_direct_edits(): void
+    {
+        [$reviewRun, $draft] = $this->createReviewRunWithDraft([
+            'status' => ReviewCommentDraftStatus::Posted,
+            'body' => 'Posted local text.',
+            'github_comment_id' => 'gh-posted',
+            'github_comment_html_url' => 'https://github.com/example/repo/pull/1#discussion_r700',
+            'posted_at' => now(),
+        ]);
+
+        $this->patch(route('reviews.drafts.update', [$reviewRun, $draft]), [
+            'body' => 'This posted draft should stay locked.',
+        ])->assertForbidden();
+
+        $this->assertDatabaseHas('review_comment_drafts', [
+            'id' => $draft->id,
+            'status' => 'posted',
+            'body' => 'Posted local text.',
+        ]);
+    }
+
+    public function test_failed_draft_rejects_direct_edits(): void
+    {
+        [$reviewRun, $draft] = $this->createReviewRunWithDraft([
+            'status' => ReviewCommentDraftStatus::Failed,
+            'body' => 'Failed local text.',
+            'publication_error_code' => 'rate_limited',
+            'publication_error_message' => 'GitHub rate limit was reached. Try publishing comments again later.',
+        ]);
+
+        $this->patch(route('reviews.drafts.update', [$reviewRun, $draft]), [
+            'body' => 'This failed draft should stay locked.',
+        ])->assertForbidden();
+
+        $this->assertDatabaseHas('review_comment_drafts', [
+            'id' => $draft->id,
+            'status' => 'failed',
+            'body' => 'Failed local text.',
+        ]);
+    }
+
     public function test_selected_drafts_can_be_approved_locally_without_posting_to_github(): void
     {
         [$reviewRun, $firstDraft] = $this->createReviewRunWithDraft();
@@ -91,7 +132,42 @@ class ReviewDraftWorkflowTest extends TestCase
         ]);
     }
 
-    public function test_review_detail_shows_edit_approval_and_stale_controls_without_publish_controls(): void
+    public function test_posted_draft_rejects_cancel_approval(): void
+    {
+        [$reviewRun, $draft] = $this->createReviewRunWithDraft([
+            'status' => ReviewCommentDraftStatus::Posted,
+            'github_comment_id' => 'gh-posted',
+            'github_comment_html_url' => 'https://github.com/example/repo/pull/1#discussion_r701',
+            'posted_at' => now(),
+        ]);
+
+        $this->post(route('reviews.drafts.unapprove', [$reviewRun, $draft]))
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('review_comment_drafts', [
+            'id' => $draft->id,
+            'status' => 'posted',
+        ]);
+    }
+
+    public function test_failed_draft_rejects_cancel_approval(): void
+    {
+        [$reviewRun, $draft] = $this->createReviewRunWithDraft([
+            'status' => ReviewCommentDraftStatus::Failed,
+            'publication_error_code' => 'server_unavailable',
+            'publication_error_message' => 'GitHub could not be reached. Try publishing comments again later.',
+        ]);
+
+        $this->post(route('reviews.drafts.unapprove', [$reviewRun, $draft]))
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('review_comment_drafts', [
+            'id' => $draft->id,
+            'status' => 'failed',
+        ]);
+    }
+
+    public function test_review_detail_shows_edit_approval_and_stale_controls_without_per_draft_publish_selectors(): void
     {
         [$reviewRun, $draft] = $this->createReviewRunWithDraft([
             'stale_at' => now(),
@@ -108,7 +184,8 @@ class ReviewDraftWorkflowTest extends TestCase
             ->assertSee('Stale Draft')
             ->assertSee('Approve Selected')
             ->assertSee('Cancel Approval')
-            ->assertDontSee('Publish');
+            ->assertDontSee('Publish Selected')
+            ->assertDontSee('name="publish_draft_id"', false);
     }
 
     /**
