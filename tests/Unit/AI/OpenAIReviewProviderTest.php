@@ -42,6 +42,16 @@ class OpenAIReviewProviderTest extends TestCase
         app(AIReviewProvider::class);
     }
 
+    public function test_openai_codex_oauth_selector_fails_closed_until_the_transport_is_installed(): void
+    {
+        config(['services.ai.provider' => 'openai_codex_oauth']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('openai_codex_oauth provider is not available');
+
+        app(AIReviewProvider::class);
+    }
+
     public function test_openai_provider_sends_http_fakeable_request_and_returns_raw_json_text(): void
     {
         config([
