@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 06
 current_phase_name: openai-codex-oauth-ai-provider
-status: executing
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-06-29T23:29:33.517Z"
-last_activity: 2026-06-29
+status: verifying
+stopped_at: Completed 06-03-PLAN.md
+last_updated: "2026-06-29T23:37:26.362Z"
+last_activity: 2026-06-30
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 23
-  completed_plans: 22
-  percent: 83
+  completed_plans: 23
+  percent: 100
 ---
 
 # Project State
@@ -27,12 +27,12 @@ See: .planning/PROJECT.md (updated 2026-06-26)
 
 ## Current Position
 
-Phase: 06 (openai-codex-oauth-ai-provider) — EXECUTING
+Phase: 06 (openai-codex-oauth-ai-provider) — VERIFYING
 Plan: 3 of 3
-Status: Ready to execute
-Last activity: 2026-06-29
+Status: Phase complete — ready for verification
+Last activity: 2026-06-30
 
-Progress: [████████░░] 83%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Progress: [████████░░] 83%
 | Phase 05 P03 | 2min | 2 tasks | 5 files |
 | Phase 06 P01 | 4min | 2 tasks | 8 files |
 | Phase 06 P02 | 2min | 2 tasks | 6 files |
+| Phase 06 P03 | 9min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,8 @@ Recent decisions affecting current work:
 - [Phase 06]: openai_codex_oauth now resolves to a dedicated HttpOpenAICodexOAuthReviewProvider behind AIReviewProvider.
 - [Phase 06]: Codex review text extraction accepts only output[].content[] output_text/text parts with a top-level output_text fallback.
 - [Phase 06]: Shared AI failure mapping keeps HTTP and response-shape messages provider-agnostic while Codex auth-cache failures remain explicit.
+- [Phase 06]: Queued feature tests now pin fake provider by default and opt into openai_codex_oauth only for explicit Codex coverage.
+- [Phase 06]: ReviewExecutionService required no provider-specific branches; queued Codex execution passes through the existing provider/decode/validate boundary unchanged.
 
 ### Pending Todos
 
@@ -105,10 +108,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- Phase 06 execution will add the explicit `openai_codex_oauth` provider path and keep fake/API-key providers distinct
-- Private repo auth model should start simple and be revisited before webhook/team work
-- GitHub ingestion starts public-only and needs focused fake-client tests before any real API dependency
-- GitHub diff-to-comment mapping is deferred beyond Phase 2; Phase 2 stores filename, patch, and sha only
+None currently. Phase 06 is complete and ready for verification.
 
 ## Deferred Items
 
@@ -121,6 +121,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-29T23:29:22.943Z
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-06-29T23:37:26.357Z
+Stopped at: Completed 06-03-PLAN.md
 Resume file: None
