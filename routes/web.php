@@ -15,5 +15,7 @@ Route::post('/reviews/{reviewRun}/run', [ReviewController::class, 'run'])->name(
 Route::post('/reviews/{reviewRun}/drafts/generate', [ReviewDraftController::class, 'generate'])->name('reviews.drafts.generate');
 Route::patch('/reviews/{reviewRun}/drafts/{reviewCommentDraft}', [ReviewDraftController::class, 'update'])->name('reviews.drafts.update');
 Route::post('/reviews/{reviewRun}/drafts/approve', [ReviewDraftController::class, 'approve'])->name('reviews.drafts.approve');
+Route::post('/reviews/{reviewRun}/drafts/publish-approved', [ReviewDraftController::class, 'publishApproved'])->name('reviews.drafts.publish-approved');
+Route::post('/reviews/{reviewRun}/drafts/retry-failed', [ReviewDraftController::class, 'retryFailed'])->name('reviews.drafts.retry-failed');
 Route::post('/reviews/{reviewRun}/drafts/{reviewCommentDraft}/unapprove', [ReviewDraftController::class, 'unapprove'])->name('reviews.drafts.unapprove');
 Route::get('/reviews/{reviewRun}', [ReviewController::class, 'show'])->name('reviews.show');

@@ -142,12 +142,32 @@
         </section>
 
         <section class="section">
+            @php
+                $hasApprovedDrafts = $reviewRun->drafts->contains(fn ($draft) => $draft->status->isApproved());
+                $hasFailedDrafts = $reviewRun->drafts->contains(fn ($draft) => $draft->status->isFailed());
+            @endphp
             <div class="detail-header" style="margin-bottom: 16px;">
                 <h2>Comment Drafts</h2>
-                <form method="POST" action="{{ route('reviews.drafts.generate', $reviewRun) }}">
-                    @csrf
-                    <button type="submit">Generate Drafts</button>
-                </form>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <form method="POST" action="{{ route('reviews.drafts.generate', $reviewRun) }}">
+                        @csrf
+                        <button type="submit">Generate Drafts</button>
+                    </form>
+
+                    @if ($hasApprovedDrafts)
+                        <form method="POST" action="{{ route('reviews.drafts.publish-approved', $reviewRun) }}">
+                            @csrf
+                            <button type="submit">Publish Approved</button>
+                        </form>
+                    @endif
+
+                    @if ($hasFailedDrafts)
+                        <form method="POST" action="{{ route('reviews.drafts.retry-failed', $reviewRun) }}">
+                            @csrf
+                            <button type="submit">Retry Failed</button>
+                        </form>
+                    @endif
+                </div>
             </div>
 
             @if ($reviewRun->drafts->isEmpty())
@@ -196,6 +216,23 @@
                                         @csrf
                                         <button type="submit">Cancel Approval</button>
                                     </form>
+                                @endif
+
+                                @if ($draft->status->isPosted())
+                                    @if ($draft->posted_at)
+                                        Posted at: {{ $draft->posted_at->format('Y-m-d H:i') }}<br>
+                                    @endif
+
+                                    @if ($draft->github_comment_html_url)
+                                        GitHub comment:
+                                        <a href="{{ $draft->github_comment_html_url }}" target="_blank" rel="noreferrer">
+                                            {{ $draft->github_comment_html_url }}
+                                        </a><br>
+                                    @endif
+                                @endif
+
+                                @if ($draft->status->isFailed() && $draft->publication_error_message)
+                                    Last publish error: {{ $draft->publication_error_message }}<br>
                                 @endif
 
                                 Head SHA: {{ $draft->github_head_sha }}@if ($draft->source_file_sha)<br>File SHA: {{ $draft->source_file_sha }}@endif

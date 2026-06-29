@@ -26,12 +26,12 @@ class ReviewCommentPublishingWorkflowTest extends TestCase
 
         $postedAt = CarbonImmutable::parse('2026-06-29T12:34:00Z');
 
-        $this->createDraft($reviewRun, [
+        $approvedDraft = $this->createDraft($reviewRun, [
             'status' => ReviewCommentDraftStatus::Approved,
             'body' => 'Publish this approved draft.',
         ]);
 
-        $this->createDraft($reviewRun, [
+        $failedDraft = $this->createDraft($reviewRun, [
             'status' => ReviewCommentDraftStatus::Failed,
             'body' => 'Retry this failed draft.',
             'publication_error_code' => 'rate_limited',
@@ -58,7 +58,11 @@ class ReviewCommentPublishingWorkflowTest extends TestCase
             ->assertSee($postedAt->format('Y-m-d H:i'))
             ->assertSee($postedDraft->github_comment_html_url, false)
             ->assertSee('GitHub rate limit was reached. Try publishing comments again later.')
-            ->assertDontSee('Cancel Approval', false);
+            ->assertDontSee(route('reviews.drafts.update', [$reviewRun, $postedDraft]), false)
+            ->assertDontSee(route('reviews.drafts.unapprove', [$reviewRun, $postedDraft]), false)
+            ->assertDontSee(route('reviews.drafts.update', [$reviewRun, $failedDraft]), false)
+            ->assertDontSee(route('reviews.drafts.unapprove', [$reviewRun, $failedDraft]), false)
+            ->assertSee(route('reviews.drafts.unapprove', [$reviewRun, $approvedDraft]), false);
     }
 
     public function test_review_detail_hides_publish_and_retry_actions_when_no_relevant_drafts_exist(): void
