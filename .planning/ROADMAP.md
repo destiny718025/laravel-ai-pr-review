@@ -185,12 +185,17 @@ Plans:
   4. Failed publication shows a safe summarized error.
   5. The system never posts AI-generated comments without explicit user approval.
 
-**Plans**: 3 plans
+**Plans**: 1/3 plans executed
 
 Plans:
+
+- [x] 05-01-PLAN.md
+- [ ] 05-02-PLAN.md
+- [ ] 05-03-PLAN.md
+
 **Wave 1**
 
-- [ ] 05-01: Add GitHub publication client write path and safe failure mapping
+- [x] 05-01: Add GitHub publication client write path and safe failure mapping
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -215,4 +220,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. GitHub PR Ingestion | 3/3 | Complete    | 2026-06-27 |
 | 3. Queued AI Review and Structured Findings | 5/5 | Complete    | 2026-06-28 |
 | 4. Draft Review and Custom Instructions | 5/5 | Complete    | 2026-06-28 |
-| 5. GitHub Comment Publishing | 0/2 | Not started | - |
+| 5. GitHub Comment Publishing | 1/3 | In Progress|  |

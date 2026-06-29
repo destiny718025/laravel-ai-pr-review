@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 05
 current_phase_name: GitHub Comment Publishing
 status: executing
-stopped_at: Phase 05 context gathered
-last_updated: "2026-06-28T23:29:08.986Z"
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-06-28T23:36:54.882Z"
 last_activity: 2026-06-28
 last_activity_desc: Phase 05 execution started
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 20
-  completed_plans: 17
-  percent: 80
+  completed_plans: 18
+  percent: 90
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-06-26)
 ## Current Position
 
 Phase: 05 (GitHub Comment Publishing) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 05
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-06-28 — Phase 05 execution started
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [████████░░] 80%
 | Phase 04-draft-review-and-custom-instructions P03 | 27min | 2 tasks | 10 files |
 | Phase 04-draft-review-and-custom-instructions P04 | 20min | 2 tasks | 10 files |
 | Phase 04-draft-review-and-custom-instructions P05 | 13min | 2 tasks | 4 files |
+| Phase 05 P01 | 3min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Recent decisions affecting current work:
 - [Phase 04-draft-review-and-custom-instructions]: Comment drafts persist in a dedicated table with copied targeting metadata and enum-backed workflow status.
 - [Phase 04-draft-review-and-custom-instructions]: Drafts can be edited, approved locally, unapproved, and marked stale during successful retry without GitHub publication.
 - [Phase 04-draft-review-and-custom-instructions]: Global custom review instructions persist separately and are appended to future AI review requests at request-build time.
+- [Phase 05]: GitHub publication now uses dedicated target/result DTOs with only id, htmlUrl, and postedAt.
+- [Phase 05]: GitHubFailureMapper now exposes publication-safe mapping separately from fetch-safe mapping.
 
 ### Pending Todos
 
@@ -102,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-28T16:33:56.796Z
-Stopped at: Phase 05 context gathered
-Resume file: .planning/phases/05-github-comment-publishing/05-CONTEXT.md
+Last session: 2026-06-28T23:36:54.877Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None
