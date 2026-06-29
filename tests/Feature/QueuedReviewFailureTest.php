@@ -25,6 +25,13 @@ class QueuedReviewFailureTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['services.ai.provider' => 'fake']);
+    }
+
     public function test_invalid_provider_json_marks_run_failed_with_safe_summary_only(): void
     {
         $this->app->instance(AIReviewProvider::class, new class implements AIReviewProvider

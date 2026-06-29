@@ -25,6 +25,13 @@ class QueuedReviewExecutionTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['services.ai.provider' => 'fake']);
+    }
+
     public function test_queued_job_marks_run_completed_and_persists_validated_findings(): void
     {
         Queue::fake();
