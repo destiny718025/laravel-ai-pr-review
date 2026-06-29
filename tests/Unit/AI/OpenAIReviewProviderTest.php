@@ -6,8 +6,8 @@ use App\Contracts\AI\AIReviewProvider;
 use App\Data\AI\AIReviewRequest;
 use App\Services\AI\FakeAIReviewProvider;
 use App\Services\AI\HttpOpenAIReviewProvider;
-use InvalidArgumentException;
 use Illuminate\Support\Facades\Http;
+use InvalidArgumentException;
 use Tests\TestCase;
 
 class OpenAIReviewProviderTest extends TestCase

@@ -12,13 +12,15 @@ class FakeAIReviewProviderTest extends TestCase
 {
     public function test_container_resolves_fake_provider_by_default(): void
     {
-        config(['services.openai.enabled' => false]);
+        config(['services.ai.provider' => 'fake']);
 
         $this->assertInstanceOf(FakeAIReviewProvider::class, app(AIReviewProvider::class));
     }
 
     public function test_fake_provider_returns_deterministic_fixture_json(): void
     {
+        config(['services.ai.provider' => 'fake']);
+
         $json = app(AIReviewProvider::class)->review($this->request());
 
         $this->assertJson($json);
