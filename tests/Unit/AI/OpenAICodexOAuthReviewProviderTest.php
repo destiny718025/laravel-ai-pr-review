@@ -6,9 +6,8 @@ use App\Data\AI\AIReviewRequest;
 use App\Data\AI\CodexAuthCredentials;
 use App\Services\AI\CodexAuthCacheReader;
 use App\Services\AI\HttpOpenAICodexOAuthReviewProvider;
-use GuzzleHttp\Psr7\Response as PsrResponse;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -211,7 +210,7 @@ class OpenAICodexOAuthReviewProviderTest extends TestCase
             'https://api.openai.test/*' => Http::response(['output_text' => '{"findings":[{"title":"fallback"}]}']),
         ]);
 
-        $this->expectException(\Illuminate\Http\Client\ConnectionException::class);
+        $this->expectException(ConnectionException::class);
 
         try {
             app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());

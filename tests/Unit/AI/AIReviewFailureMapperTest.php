@@ -43,7 +43,7 @@ class AIReviewFailureMapperTest extends TestCase
         $failure = app(AIReviewFailureMapper::class)->map($this->requestException(401));
 
         $this->assertSame('auth_rejected', $failure->code);
-        $this->assertSame('Codex rejected the current session. Sign in again with Codex CLI and try again.', $failure->message);
+        $this->assertSame('AI provider rejected the current authentication. Refresh the active provider credentials and try again.', $failure->message);
     }
 
     public function test_forbidden_request_failure_maps_to_safe_summary(): void
@@ -51,7 +51,7 @@ class AIReviewFailureMapperTest extends TestCase
         $failure = app(AIReviewFailureMapper::class)->map($this->requestException(403));
 
         $this->assertSame('auth_rejected', $failure->code);
-        $this->assertSame('Codex rejected the current session. Sign in again with Codex CLI and try again.', $failure->message);
+        $this->assertSame('AI provider rejected the current authentication. Refresh the active provider credentials and try again.', $failure->message);
     }
 
     public function test_rate_limited_request_failure_maps_to_safe_summary(): void
@@ -59,7 +59,7 @@ class AIReviewFailureMapperTest extends TestCase
         $failure = app(AIReviewFailureMapper::class)->map($this->requestException(429));
 
         $this->assertSame('rate_limited', $failure->code);
-        $this->assertSame('Codex rate limit was reached. Try running the review again later.', $failure->message);
+        $this->assertSame('AI provider rate limit was reached. Try running the review again later.', $failure->message);
     }
 
     public function test_json_decode_failure_maps_to_safe_summary(): void
@@ -88,7 +88,7 @@ class AIReviewFailureMapperTest extends TestCase
         );
 
         $this->assertSame('provider_unavailable', $failure->code);
-        $this->assertSame('Codex could not be reached. Try running the review again later.', $failure->message);
+        $this->assertSame('AI provider could not be reached. Try running the review again later.', $failure->message);
         $this->assertStringNotContainsString('sk-secret', $failure->message);
     }
 
@@ -99,7 +99,7 @@ class AIReviewFailureMapperTest extends TestCase
         );
 
         $this->assertSame('malformed_response', $failure->code);
-        $this->assertSame('Codex returned an unexpected response. Try running the review again.', $failure->message);
+        $this->assertSame('AI provider returned an unexpected response. Try running the review again.', $failure->message);
     }
 
     public function test_unsupported_response_shape_maps_to_safe_summary(): void
@@ -109,7 +109,7 @@ class AIReviewFailureMapperTest extends TestCase
         );
 
         $this->assertSame('invalid_response_shape', $failure->code);
-        $this->assertSame('Codex returned an unsupported response shape. Try running the review again.', $failure->message);
+        $this->assertSame('AI provider returned an unsupported response shape. Try running the review again.', $failure->message);
     }
 
     public function test_unexpected_runtime_failure_maps_to_safe_summary(): void
