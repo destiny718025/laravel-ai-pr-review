@@ -221,3 +221,14 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 3. Queued AI Review and Structured Findings | 5/5 | Complete    | 2026-06-28 |
 | 4. Draft Review and Custom Instructions | 5/5 | Complete    | 2026-06-28 |
 | 5. GitHub Comment Publishing | 3/3 | Complete    | 2026-06-29 |
+
+### Phase 6: OpenAI Codex OAuth AI Provider
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 5
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 6 to break down)
