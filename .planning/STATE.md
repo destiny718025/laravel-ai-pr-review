@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 06
 current_phase_name: openai-codex-oauth-ai-provider
 status: executing
-stopped_at: Phase 06 planned
-last_updated: "2026-06-29T13:24:20.734Z"
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-06-29T13:33:55.582Z"
 last_activity: 2026-06-29
 last_activity_desc: Phase 06 execution started
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 23
-  completed_plans: 20
-  percent: 83
+  completed_plans: 21
+  percent: 91
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-06-26)
 ## Current Position
 
 Phase: 06 (openai-codex-oauth-ai-provider) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 06
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-06-29 — Phase 06 execution started
 
-Progress: [████████░░] 87%
+Progress: [█████████░] 91%
 
 ## Performance Metrics
 
@@ -66,6 +66,7 @@ Progress: [████████░░] 87%
 | Phase 05 P01 | 3min | 2 tasks | 9 files |
 | Phase 05 P02 | 3min | 2 tasks | 7 files |
 | Phase 05 P03 | 2min | 2 tasks | 5 files |
+| Phase 06 P01 | 4min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,9 @@ Recent decisions affecting current work:
 - [Phase 05]: Publish Approved and Retry Failed remain section-level POST forms inside Comment Drafts only.
 - [Phase 05]: ReviewDraftController flashes only safe count-based publication summaries while ReviewCommentPublishingService owns GitHub behavior.
 - [Phase 05]: Posted and failed drafts remain read-only in Blade and are route-guarded from update and unapprove actions.
+- [Phase 06]: AI provider selection is now explicit via AI_PROVIDER with fake as the default deterministic path.
+- [Phase 06]: Codex CLI auth reuse is isolated behind a read-only runtime cache reader that exposes minimal credentials only.
+- [Phase 06]: openai_codex_oauth remains a fail-closed reserved selector until the dedicated transport lands in Plan 06-02.
 
 ### Pending Todos
 
@@ -114,6 +118,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-29T08:09:46.679Z
-Stopped at: Phase 06 planned
-Resume file: .planning/phases/06-openai-codex-oauth-ai-provider/06-01-PLAN.md
+Last session: 2026-06-29T13:33:55.517Z
+Stopped at: Completed 06-01-PLAN.md
+Resume file: None
