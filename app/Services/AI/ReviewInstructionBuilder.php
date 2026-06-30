@@ -13,7 +13,10 @@ class ReviewInstructionBuilder
             'Include style findings only when they are useful and not noisy.',
             'Use only these severity labels: critical, high, medium, low.',
             'Use only these category labels: bug, security, performance, maintainability, style.',
-            'Return JSON with a findings array. Each finding must include severity, category, file_path, line_reference, title, rationale, and suggested_comment_text.',
+            'Return exactly one JSON object and no surrounding prose or markdown.',
+            'The only top-level key must be findings.',
+            'If there are no actionable findings, return {"findings":[]}.',
+            'Each finding must include severity, category, file_path, line_reference, title, rationale, and suggested_comment_text.',
             'Do not include comment draft state, approval state, or GitHub publication metadata.',
         ]);
     }

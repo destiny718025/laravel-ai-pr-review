@@ -139,6 +139,8 @@ JSON,
                 && $request->method() === 'POST'
                 && $request->hasHeader('Authorization', 'Bearer codex-access-token')
                 && $request->hasHeader('ChatGPT-Account-ID', 'acct-123')
+                && $payload['store'] === false
+                && $payload['stream'] === true
                 && $payload['input'][0]['role'] === 'system'
                 && is_string($payload['input'][0]['content'])
                 && str_contains($payload['input'][0]['content'], 'bug')
