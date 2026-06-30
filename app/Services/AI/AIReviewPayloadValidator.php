@@ -17,6 +17,8 @@ class AIReviewPayloadValidator
      */
     public function validate(array $payload): array
     {
+        $payload = $this->normalizePayload($payload);
+
         $this->rejectUnknownTopLevelKeys($payload);
         $this->rejectUnknownFindingKeys($payload);
 
@@ -38,6 +40,74 @@ class AIReviewPayloadValidator
             fn (array $finding): ValidatedFindingPayload => ValidatedFindingPayload::fromArray($finding),
             $validated['findings'],
         );
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @return array<string, mixed>
+     */
+    private function normalizePayload(array $payload): array
+    {
+        if (! isset($payload['findings']) || ! is_array($payload['findings'])) {
+            return $payload;
+        }
+
+        $payload['findings'] = array_map(
+            fn (mixed $finding): mixed => is_array($finding) ? $this->normalizeFinding($finding) : $finding,
+            $payload['findings'],
+        );
+
+        return $payload;
+    }
+
+    /**
+     * @param  array<string, mixed>  $finding
+     * @return array<string, mixed>
+     */
+    private function normalizeFinding(array $finding): array
+    {
+        $this->copyAlias($finding, 'file_path', ['file', 'path', 'filename']);
+        $this->copyAlias($finding, 'line_reference', ['line', 'line_number', 'lineNumber']);
+        $this->copyAlias($finding, 'rationale', ['reason', 'description']);
+        $this->copyAlias($finding, 'suggested_comment_text', ['suggested_comment', 'comment', 'suggestion']);
+
+        foreach (['severity', 'category'] as $key) {
+            if (is_scalar($finding[$key] ?? null)) {
+                $finding[$key] = strtolower(trim((string) $finding[$key]));
+            }
+        }
+
+        foreach (['file_path', 'line_reference', 'title', 'rationale', 'suggested_comment_text'] as $key) {
+            if (array_key_exists($key, $finding) && is_scalar($finding[$key])) {
+                $finding[$key] = trim((string) $finding[$key]);
+            }
+        }
+
+        if (($finding['line_reference'] ?? null) === '') {
+            $finding['line_reference'] = null;
+        }
+
+        return $finding;
+    }
+
+    /**
+     * @param  array<string, mixed>  $finding
+     * @param  list<string>  $aliases
+     */
+    private function copyAlias(array &$finding, string $target, array $aliases): void
+    {
+        if (array_key_exists($target, $finding)) {
+            return;
+        }
+
+        foreach ($aliases as $alias) {
+            if (array_key_exists($alias, $finding)) {
+                $finding[$target] = $finding[$alias];
+                unset($finding[$alias]);
+
+                return;
+            }
+        }
     }
 
     /**

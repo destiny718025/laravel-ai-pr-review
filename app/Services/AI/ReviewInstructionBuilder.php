@@ -30,6 +30,11 @@ class ReviewInstructionBuilder
             return $default;
         }
 
-        return $default."\n\nCustom Review Instructions:\n".$customInstructions;
+        return $default
+            ."\n\nCustom Review Instructions:\n".$customInstructions
+            ."\n\nOutput Contract Reminder:\n"
+            .'Custom instructions may change review focus and the natural language used in title, rationale, and suggested_comment_text. '
+            .'They must not change JSON keys, top-level structure, required fields, or the allowed severity/category labels. '
+            .'Always return the same JSON contract described above.';
     }
 }
