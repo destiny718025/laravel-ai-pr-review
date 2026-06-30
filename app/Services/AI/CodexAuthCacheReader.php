@@ -78,7 +78,7 @@ class CodexAuthCacheReader
     /**
      * @return list<string>
      */
-    private function candidatePaths(): array
+    public function candidatePaths(): array
     {
         $paths = [];
 

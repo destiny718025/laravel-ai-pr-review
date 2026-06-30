@@ -47,6 +47,10 @@ class OpenAICodexOAuthReviewProviderTest extends TestCase
                 && $request->method() === 'POST'
                 && $request->hasHeader('Authorization', 'Bearer codex-access-token')
                 && $request->hasHeader('ChatGPT-Account-ID', 'acct-123')
+                && $request->hasHeader('Accept', 'text/event-stream')
+                && $request->hasHeader('Content-Type', 'application/json')
+                && $payload['store'] === false
+                && $payload['stream'] === true
                 && $payload['input'][0]['role'] === 'system'
                 && $payload['input'][0]['content'] === 'Review this PR.'
                 && $reviewInput['repository'] === 'laravel/framework'
@@ -57,6 +61,433 @@ class OpenAICodexOAuthReviewProviderTest extends TestCase
                 && $reviewInput['files'][0]['filename'] === 'app/Example.php';
         });
         Http::assertSentCount(1);
+    }
+
+    public function test_provider_extracts_review_json_from_streaming_output_text_delta_events(): void
+    {
+        $this->fakeCredentials('codex-access-token', 'acct-123');
+        $this->configureProvider();
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response(implode("\n", [
+                'event: response.output_text.delta',
+                'data: {"type":"response.output_text.delta","delta":"{\"findings\""}',
+                '',
+                'event: response.output_text.delta',
+                'data: {"type":"response.output_text.delta","delta":":[]}"}',
+                '',
+                'event: response.completed',
+                'data: {"type":"response.completed"}',
+                '',
+                'data: [DONE]',
+                '',
+            ]), 200, ['Content-Type' => 'text/event-stream']),
+        ]);
+
+        $json = app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());
+
+        $this->assertSame('{"findings":[]}', $json);
+        Http::assertSent(function ($request): bool {
+            $payload = $request->data();
+
+            return $request->url() === 'https://chatgpt.test/backend-api/codex/responses'
+                && $payload['store'] === false
+                && $payload['stream'] === true;
+        });
+        Http::assertSentCount(1);
+    }
+
+    public function test_provider_uses_sse_event_name_when_stream_data_omits_type(): void
+    {
+        $this->fakeCredentials('codex-access-token', 'acct-123');
+        $this->configureProvider();
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response(implode("\n", [
+                'event: response.output_text.delta',
+                'data: {"delta":"{\"findings\""}',
+                '',
+                'event: response.output_text.delta',
+                'data: {"delta":":[]}"}',
+                '',
+                'event: response.completed',
+                'data: {"id":"resp_123","object":"response","status":"completed","output":[]}',
+                '',
+                'data: [DONE]',
+                '',
+            ]), 200, ['Content-Type' => 'text/event-stream']),
+        ]);
+
+        $json = app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());
+
+        $this->assertSame('{"findings":[]}', $json);
+        Http::assertSentCount(1);
+    }
+
+    public function test_provider_extracts_review_json_from_streaming_nested_output_item_events(): void
+    {
+        $this->fakeCredentials('codex-access-token', 'acct-123');
+        $this->configureProvider();
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response(implode("\n", [
+                'event: response.output_item.done',
+                'data: {"type":"response.output_item.done","item":{"type":"message","content":[{"type":"output_text","text":"{\"findings\":[]}"}]}}',
+                '',
+                'data: [DONE]',
+                '',
+            ]), 200, ['Content-Type' => 'text/event-stream']),
+        ]);
+
+        $json = app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());
+
+        $this->assertSame('{"findings":[]}', $json);
+        Http::assertSentCount(1);
+    }
+
+    public function test_provider_ignores_pending_stream_events_until_output_arrives(): void
+    {
+        $this->fakeCredentials('codex-access-token', 'acct-123');
+        $this->configureProvider();
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response(implode("\n", [
+                'event: response.created',
+                'data: {"id":"resp_123","object":"response","status":"in_progress","output":[]}',
+                '',
+                'event: response.output_text.delta',
+                'data: {"type":"response.output_text.delta","delta":"{\"findings\":[]}"}',
+                '',
+                'event: response.completed',
+                'data: {"type":"response.completed"}',
+                '',
+                'data: [DONE]',
+                '',
+            ]), 200, ['Content-Type' => 'text/event-stream']),
+        ]);
+
+        $json = app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());
+
+        $this->assertSame('{"findings":[]}', $json);
+        Http::assertSentCount(1);
+    }
+
+    public function test_provider_retrieves_completed_stream_response_when_output_is_missing(): void
+    {
+        $this->fakeCredentials('codex-access-token', 'acct-123');
+        $this->configureProvider();
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response(implode("\n", [
+                'event: response.created',
+                'data: {"id":"resp_123","object":"response","status":"in_progress","output":[]}',
+                '',
+                'event: response.completed',
+                'data: {"id":"resp_123","object":"response","status":"completed","output":[]}',
+                '',
+                'data: [DONE]',
+                '',
+            ]), 200, ['Content-Type' => 'text/event-stream']),
+            'https://chatgpt.test/backend-api/codex/responses/resp_123' => Http::response([
+                'id' => 'resp_123',
+                'object' => 'response',
+                'status' => 'completed',
+                'output_text' => '{"findings":[]}',
+            ]),
+        ]);
+
+        $json = app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());
+
+        $this->assertSame('{"findings":[]}', $json);
+        Http::assertSentCount(2);
+    }
+
+    public function test_provider_reports_stream_event_types_for_unsupported_streaming_shapes(): void
+    {
+        $this->fakeCredentials('codex-access-token', 'acct-123');
+        $this->configureProvider();
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response(implode("\n", [
+                'event: response.created',
+                'data: {"type":"response.created"}',
+                '',
+                'event: response.completed',
+                'data: {"type":"response.completed"}',
+                '',
+            ]), 200, ['Content-Type' => 'text/event-stream']),
+        ]);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Event types seen: response.created, response.completed.');
+
+        app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());
+    }
+
+    public function test_provider_extracts_review_json_from_wrapped_response_object(): void
+    {
+        $this->fakeCredentials('codex-access-token', 'acct-123');
+        $this->configureProvider();
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response([
+                'type' => 'response.completed',
+                'response' => [
+                    'output' => [
+                        [
+                            'type' => 'message',
+                            'content' => [
+                                [
+                                    'type' => 'output_text',
+                                    'text' => '{"findings":[]}',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $json = app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());
+
+        $this->assertSame('{"findings":[]}', $json);
+        Http::assertSentCount(1);
+    }
+
+    public function test_provider_polls_in_progress_response_until_completed(): void
+    {
+        $this->fakeCredentials('codex-access-token', 'acct-123');
+        $this->configureProvider();
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response([
+                'id' => 'resp_123',
+                'object' => 'response',
+                'status' => 'in_progress',
+                'output' => [],
+            ]),
+            'https://chatgpt.test/backend-api/codex/responses/resp_123' => Http::sequence()
+                ->push([
+                    'id' => 'resp_123',
+                    'object' => 'response',
+                    'status' => 'in_progress',
+                    'output' => [],
+                ])
+                ->push([
+                    'id' => 'resp_123',
+                    'object' => 'response',
+                    'status' => 'completed',
+                    'output' => [
+                        [
+                            'type' => 'message',
+                            'content' => [
+                                [
+                                    'type' => 'output_text',
+                                    'text' => '{"findings":[]}',
+                                ],
+                            ],
+                        ],
+                    ],
+                ]),
+        ]);
+
+        $json = app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());
+
+        $this->assertSame('{"findings":[]}', $json);
+        Http::assertSentCount(3);
+        Http::assertSent(function ($request): bool {
+            return $request->url() === 'https://chatgpt.test/backend-api/codex/responses'
+                && $request->method() === 'POST'
+                && $request->hasHeader('Accept', 'text/event-stream');
+        });
+        Http::assertSent(function ($request): bool {
+            return $request->url() === 'https://chatgpt.test/backend-api/codex/responses/resp_123'
+                && $request->method() === 'GET'
+                && $request->hasHeader('Accept', 'application/json');
+        });
+    }
+
+    public function test_provider_polls_in_progress_response_with_padded_status(): void
+    {
+        $this->fakeCredentials('codex-access-token', 'acct-123');
+        $this->configureProvider();
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response([
+                'id' => 'resp_123',
+                'object' => 'response',
+                'status' => " in_progress\n",
+                'output' => [],
+            ]),
+            'https://chatgpt.test/backend-api/codex/responses/resp_123' => Http::response([
+                'id' => 'resp_123',
+                'object' => 'response',
+                'status' => 'completed',
+                'output' => [
+                    [
+                        'type' => 'message',
+                        'content' => [
+                            [
+                                'type' => 'output_text',
+                                'text' => '{"findings":[]}',
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $json = app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());
+
+        $this->assertSame('{"findings":[]}', $json);
+        Http::assertSentCount(2);
+    }
+
+    public function test_provider_polls_empty_response_with_id_even_when_status_is_unexpected(): void
+    {
+        $this->fakeCredentials('codex-access-token', 'acct-123');
+        $this->configureProvider();
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response([
+                'id' => 'resp_123',
+                'object' => 'response',
+                'status' => 'mystery_pending_status',
+                'output' => [],
+            ]),
+            'https://chatgpt.test/backend-api/codex/responses/resp_123' => Http::response([
+                'id' => 'resp_123',
+                'object' => 'response',
+                'status' => 'completed',
+                'output' => [
+                    [
+                        'type' => 'message',
+                        'content' => [
+                            [
+                                'type' => 'output_text',
+                                'text' => '{"findings":[]}',
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $json = app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());
+
+        $this->assertSame('{"findings":[]}', $json);
+        Http::assertSentCount(2);
+    }
+
+    public function test_provider_polls_empty_response_with_scalar_id(): void
+    {
+        $this->fakeCredentials('codex-access-token', 'acct-123');
+        $this->configureProvider();
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response([
+                'id' => 123,
+                'object' => 'response',
+                'status' => 'in_progress',
+                'output' => [],
+            ]),
+            'https://chatgpt.test/backend-api/codex/responses/123' => Http::response([
+                'id' => 123,
+                'object' => 'response',
+                'status' => 'completed',
+                'output_text' => '{"findings":[]}',
+            ]),
+        ]);
+
+        $json = app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());
+
+        $this->assertSame('{"findings":[]}', $json);
+        Http::assertSentCount(2);
+    }
+
+    public function test_provider_fails_safely_when_polling_limit_is_reached(): void
+    {
+        $this->fakeCredentials('codex-access-token', 'acct-123');
+        $this->configureProvider(['services.codex.poll_attempts' => 2]);
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response([
+                'id' => 'resp_123',
+                'object' => 'response',
+                'status' => 'in_progress',
+                'output' => [],
+            ]),
+            'https://chatgpt.test/backend-api/codex/responses/resp_123' => Http::response([
+                'id' => 'resp_123',
+                'object' => 'response',
+                'status' => 'in_progress',
+                'output' => [],
+            ]),
+        ]);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Codex response did not complete before polling limit.');
+
+        try {
+            app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());
+        } finally {
+            Http::assertSentCount(3);
+        }
+    }
+
+    public function test_provider_reports_non_streaming_response_shape_without_raw_text(): void
+    {
+        $this->fakeCredentials('codex-access-token', 'acct-123');
+        $this->configureProvider();
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://chatgpt.test/backend-api/codex/responses' => Http::response([
+                'id' => 'resp_123',
+                'type' => 'response.completed',
+                'status' => 'completed',
+                'output' => [
+                    [
+                        'type' => 'reasoning',
+                        'summary' => [
+                            [
+                                'type' => 'summary_text',
+                                'text' => 'do not leak this text',
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        try {
+            app(HttpOpenAICodexOAuthReviewProvider::class)->review($this->request());
+        } catch (\UnexpectedValueException $exception) {
+            $message = $exception->getMessage();
+
+            $this->assertStringContainsString('Top-level keys: id, type, status, output.', $message);
+            $this->assertStringContainsString('Type: response.completed.', $message);
+            $this->assertStringContainsString('Status: completed.', $message);
+            $this->assertStringContainsString('Output item types: reasoning.', $message);
+            $this->assertStringContainsString('Content part types: none.', $message);
+            $this->assertStringNotContainsString('do not leak this text', $message);
+
+            return;
+        }
+
+        $this->fail('Expected unsupported response shape exception.');
     }
 
     public function test_provider_accepts_text_parts_and_omits_account_header_when_not_available(): void
@@ -222,14 +653,19 @@ class OpenAICodexOAuthReviewProviderTest extends TestCase
         }
     }
 
-    private function configureProvider(): void
+    /**
+     * @param  array<string, mixed>  $overrides
+     */
+    private function configureProvider(array $overrides = []): void
     {
-        config([
+        config(array_merge([
             'services.codex.base_url' => 'https://chatgpt.test/backend-api/codex',
             'services.codex.timeout' => 7,
+            'services.codex.poll_attempts' => 5,
+            'services.codex.poll_sleep_ms' => 0,
             'services.openai.base_url' => 'https://api.openai.test',
             'services.openai.api_key' => 'sk-openai-should-not-be-used',
-        ]);
+        ], $overrides));
     }
 
     private function fakeCredentials(string $accessToken, ?string $accountId = null): void

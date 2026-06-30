@@ -21,7 +21,7 @@ class AIReviewPayloadValidator
         $this->rejectUnknownFindingKeys($payload);
 
         $validator = Validator::make($payload, [
-            'findings' => ['required', 'array'],
+            'findings' => ['present', 'array'],
             'findings.*' => ['required', 'array'],
             'findings.*.severity' => ['required', 'string', Rule::in(ValidatedFindingPayload::SEVERITIES)],
             'findings.*.category' => ['required', 'string', Rule::in(ValidatedFindingPayload::CATEGORIES)],

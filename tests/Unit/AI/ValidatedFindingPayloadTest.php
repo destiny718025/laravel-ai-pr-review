@@ -51,6 +51,15 @@ class ValidatedFindingPayloadTest extends TestCase
         $this->assertNull($findings[0]->lineReference);
     }
 
+    public function test_validator_allows_empty_findings_array(): void
+    {
+        $findings = app(AIReviewPayloadValidator::class)->validate([
+            'findings' => [],
+        ]);
+
+        $this->assertSame([], $findings);
+    }
+
     public function test_validator_rejects_unknown_vocabulary_and_unexpected_structure(): void
     {
         $this->expectException(ValidationException::class);

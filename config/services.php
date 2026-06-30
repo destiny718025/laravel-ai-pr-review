@@ -45,6 +45,8 @@ return [
         'fallback_home' => env('HOME'),
         'base_url' => env('CODEX_BASE_URL', 'https://chatgpt.com/backend-api/codex'),
         'timeout' => env('CODEX_TIMEOUT', 30),
+        'poll_attempts' => env('CODEX_POLL_ATTEMPTS', 20),
+        'poll_sleep_ms' => env('CODEX_POLL_SLEEP_MS', 250),
     ],
 
     'ses' => [
