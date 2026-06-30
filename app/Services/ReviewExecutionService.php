@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Contracts\AI\AIReviewProvider;
 use App\Data\AI\AIReviewRequest;
 use App\Models\ReviewRun;
+use App\Repositories\ReviewCommentDraftRepository;
 use App\Repositories\ReviewFindingRepository;
+use App\Repositories\ReviewInstructionSettingRepository;
 use App\Repositories\ReviewRunRepository;
 use App\Services\AI\AIReviewFailureMapper;
 use App\Services\AI\AIReviewPayloadValidator;
@@ -17,6 +19,8 @@ class ReviewExecutionService
     public function __construct(
         private readonly ReviewRunRepository $reviewRuns,
         private readonly ReviewFindingRepository $findings,
+        private readonly ReviewCommentDraftRepository $drafts,
+        private readonly ReviewInstructionSettingRepository $instructionSettings,
         private readonly AIReviewProvider $provider,
         private readonly AIReviewPayloadValidator $validator,
         private readonly AIReviewFailureMapper $failureMapper,
@@ -43,7 +47,9 @@ class ReviewExecutionService
             $validatedFindings = $this->validator->validate($payload);
 
             DB::transaction(function () use ($reviewRun, $validatedFindings): void {
-                $this->findings->replaceForReviewRun($reviewRun, $validatedFindings);
+                $this->drafts->markStaleForReviewRun($reviewRun);
+                $this->findings->supersedeCurrentForReviewRun($reviewRun);
+                $this->findings->storeCurrentForReviewRun($reviewRun, $validatedFindings);
                 $this->reviewRuns->markCompleted($reviewRun);
             });
         } catch (\Throwable $throwable) {
@@ -73,7 +79,9 @@ class ReviewExecutionService
                 ])
                 ->values()
                 ->all(),
-            instructions: $this->instructionBuilder->buildDefault(),
+            instructions: $this->instructionBuilder->buildWithCustomInstructions(
+                $this->instructionSettings->findGlobal()?->custom_instructions,
+            ),
         );
     }
 }

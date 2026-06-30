@@ -35,7 +35,7 @@ class ReviewRunRepository
     public function findWithPullRequestRepositoryOrFail(int|string $id): ReviewRun
     {
         return ReviewRun::query()
-            ->with(['files', 'findings', 'pullRequest.repository'])
+            ->with(['files', 'currentFindings', 'drafts.sourceFinding', 'pullRequest.repository'])
             ->findOrFail($id);
     }
 

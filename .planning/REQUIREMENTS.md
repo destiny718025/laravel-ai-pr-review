@@ -36,32 +36,32 @@ Requirements for the initial personal-use MVP. Each requirement is testable and 
 
 ### Review Execution
 
-- [ ] **EXEC-01**: System dispatches review execution to a Laravel queued job instead of running AI review work inside the HTTP request
-- [ ] **EXEC-02**: Review execution job loads the review run and marks it in progress before external work begins
-- [ ] **EXEC-03**: Review execution job marks the review run completed when findings and drafts are persisted
-- [ ] **EXEC-04**: Review execution job marks the review run failed with a safe summarized error when GitHub, AI, or parsing work fails
-- [ ] **EXEC-05**: Review execution avoids logging raw API credentials, authorization headers, or unredacted provider payloads
+- [x] **EXEC-01**: System dispatches review execution to a Laravel queued job instead of running AI review work inside the HTTP request
+- [x] **EXEC-02**: Review execution job loads the review run and marks it in progress before external work begins
+- [x] **EXEC-03**: Review execution job marks the review run completed when findings and drafts are persisted
+- [x] **EXEC-04**: Review execution job marks the review run failed with a safe summarized error when GitHub, AI, or parsing work fails
+- [x] **EXEC-05**: Review execution avoids logging raw API credentials, authorization headers, or unredacted provider payloads
 
 ### AI Review
 
-- [ ] **AI-01**: System defines an AI review provider interface for generating structured review output
-- [ ] **AI-02**: System includes a fake AI review provider for deterministic local tests
-- [ ] **AI-03**: System can use one concrete AI provider implementation behind the provider interface
-- [ ] **AI-04**: AI review output is validated against a structured finding schema before persistence
-- [ ] **AI-05**: Structured findings include severity, category, file path, line reference when available, title, rationale, and suggested comment text
-- [ ] **AI-06**: Default review instructions prioritize bug and security issues
-- [ ] **AI-07**: Default review instructions allow Laravel/PHP style feedback when it is useful and not noisy
-- [ ] **AI-08**: Invalid or incomplete AI output fails the review run safely without creating malformed findings
+- [x] **AI-01**: System defines an AI review provider interface for generating structured review output
+- [x] **AI-02**: System includes a fake AI review provider for deterministic local tests
+- [x] **AI-03**: System can use one concrete AI provider implementation behind the provider interface
+- [x] **AI-04**: AI review output is validated against a structured finding schema before persistence
+- [x] **AI-05**: Structured findings include severity, category, file path, line reference when available, title, rationale, and suggested comment text
+- [x] **AI-06**: Default review instructions prioritize bug and security issues
+- [x] **AI-07**: Default review instructions allow Laravel/PHP style feedback when it is useful and not noisy
+- [x] **AI-08**: Invalid or incomplete AI output fails the review run safely without creating malformed findings
 
 ### Findings and Comment Drafts
 
-- [ ] **DRAFT-01**: System persists structured review findings for a completed review run
+- [x] **DRAFT-01**: System persists structured review findings for a completed review run
 - [ ] **DRAFT-02**: System creates comment drafts from AI findings instead of posting comments automatically
 - [ ] **DRAFT-03**: User can view findings and comment drafts on the review run detail page
 - [ ] **DRAFT-04**: User can edit a comment draft before approving it
 - [ ] **DRAFT-05**: User can approve one or more comment drafts for publication
-- [ ] **DRAFT-06**: Comment drafts track publication status such as draft, approved, posted, and failed
-- [ ] **DRAFT-07**: Comment drafts retain GitHub comment targeting metadata needed for line-level publication when available
+- [x] **DRAFT-06**: Comment drafts track publication status such as draft, approved, posted, and failed
+- [x] **DRAFT-07**: Comment drafts retain GitHub comment targeting metadata needed for line-level publication when available
 
 ### Custom Review Instructions
 
@@ -72,12 +72,12 @@ Requirements for the initial personal-use MVP. Each requirement is testable and 
 
 ### GitHub Comment Publishing
 
-- [ ] **PUB-01**: User can publish approved comment drafts to GitHub
-- [ ] **PUB-02**: System publishes comments through a GitHub client interface
-- [ ] **PUB-03**: System records successful GitHub publication on each published draft
-- [ ] **PUB-04**: System records failed GitHub publication on each failed draft with a safe summarized error
-- [ ] **PUB-05**: Tests can fake GitHub comment publication without calling the real GitHub API
-- [ ] **PUB-06**: System never publishes AI-generated comments without explicit user approval
+- [x] **PUB-01**: User can publish approved comment drafts to GitHub
+- [x] **PUB-02**: System publishes comments through a GitHub client interface
+- [x] **PUB-03**: System records successful GitHub publication on each published draft
+- [x] **PUB-04**: System records failed GitHub publication on each failed draft with a safe summarized error
+- [x] **PUB-05**: Tests can fake GitHub comment publication without calling the real GitHub API
+- [x] **PUB-06**: System never publishes AI-generated comments without explicit user approval
 
 ## v2 Requirements
 
@@ -151,36 +151,36 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GH-04 | Phase 2 | Complete |
 | GH-05 | Phase 2 | Complete |
 | GH-06 | Phase 2 | Complete |
-| EXEC-01 | Phase 3 | Pending |
-| EXEC-02 | Phase 3 | Pending |
-| EXEC-03 | Phase 3 | Pending |
-| EXEC-04 | Phase 3 | Pending |
-| EXEC-05 | Phase 3 | Pending |
-| AI-01 | Phase 3 | Pending |
-| AI-02 | Phase 3 | Pending |
-| AI-03 | Phase 3 | Pending |
-| AI-04 | Phase 3 | Pending |
-| AI-05 | Phase 3 | Pending |
-| AI-06 | Phase 3 | Pending |
-| AI-07 | Phase 3 | Pending |
-| AI-08 | Phase 3 | Pending |
-| DRAFT-01 | Phase 4 | Pending |
+| EXEC-01 | Phase 3 | Complete |
+| EXEC-02 | Phase 3 | Complete |
+| EXEC-03 | Phase 3 | Complete |
+| EXEC-04 | Phase 3 | Complete |
+| EXEC-05 | Phase 3 | Complete |
+| AI-01 | Phase 3 | Complete |
+| AI-02 | Phase 3 | Complete |
+| AI-03 | Phase 3 | Complete |
+| AI-04 | Phase 3 | Complete |
+| AI-05 | Phase 3 | Complete |
+| AI-06 | Phase 3 | Complete |
+| AI-07 | Phase 3 | Complete |
+| AI-08 | Phase 3 | Complete |
+| DRAFT-01 | Phase 4 | Complete |
 | DRAFT-02 | Phase 4 | Pending |
 | DRAFT-03 | Phase 4 | Pending |
 | DRAFT-04 | Phase 4 | Pending |
 | DRAFT-05 | Phase 4 | Pending |
-| DRAFT-06 | Phase 4 | Pending |
-| DRAFT-07 | Phase 4 | Pending |
+| DRAFT-06 | Phase 4 | Complete |
+| DRAFT-07 | Phase 4 | Complete |
 | RULE-01 | Phase 4 | Pending |
 | RULE-02 | Phase 4 | Pending |
 | RULE-03 | Phase 4 | Pending |
 | RULE-04 | Phase 4 | Pending |
-| PUB-01 | Phase 5 | Pending |
-| PUB-02 | Phase 5 | Pending |
-| PUB-03 | Phase 5 | Pending |
-| PUB-04 | Phase 5 | Pending |
-| PUB-05 | Phase 5 | Pending |
-| PUB-06 | Phase 5 | Pending |
+| PUB-01 | Phase 5 | Complete |
+| PUB-02 | Phase 5 | Complete |
+| PUB-03 | Phase 5 | Complete |
+| PUB-04 | Phase 5 | Complete |
+| PUB-05 | Phase 5 | Complete |
+| PUB-06 | Phase 5 | Complete |
 
 **Coverage:**
 

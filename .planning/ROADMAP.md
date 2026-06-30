@@ -13,9 +13,9 @@ The v1 roadmap builds a vertical MVP from a usable Laravel management interface 
 
 - [x] **Phase 1: Review Run Foundation and Management UI** - User can submit PR URLs and see persisted review run status/history
 - [x] **Phase 2: GitHub PR Ingestion** - System fetches PR metadata/files and stores replayable diff snapshots (completed 2026-06-27)
-- [ ] **Phase 3: Queued AI Review and Structured Findings** - System executes review jobs through an AI provider interface and persists validated findings
-- [ ] **Phase 4: Draft Review and Custom Instructions** - User can inspect findings, edit drafts, approve drafts, and tune simple instructions
-- [ ] **Phase 5: GitHub Comment Publishing** - User can publish approved drafts to GitHub with per-draft status and error handling
+- [x] **Phase 3: Queued AI Review and Structured Findings** - System executes review jobs through an AI provider interface and persists validated findings (completed 2026-06-28)
+- [x] **Phase 4: Draft Review and Custom Instructions** - User can inspect findings, edit drafts, approve drafts, and tune simple instructions (completed 2026-06-28)
+- [x] **Phase 5: GitHub Comment Publishing** - User can publish approved drafts to GitHub with per-draft status and error handling (completed 2026-06-29)
 
 ## Phase Details
 
@@ -88,7 +88,7 @@ Plans:
 
 ### Phase 3: Queued AI Review and Structured Findings
 
-**Goal**: Execute review work asynchronously and persist validated AI findings.
+**Goal**: As a reviewer, I want to run AI review asynchronously for a fetched GitHub pull request, so that validated findings are persisted and visible without blocking the request.
 **Mode:** mvp
 **Depends on**: Phase 2
 **Requirements**: [EXEC-01, EXEC-02, EXEC-03, EXEC-04, EXEC-05, AI-01, AI-02, AI-03, AI-04, AI-05, AI-06, AI-07, AI-08]
@@ -141,13 +141,35 @@ Plans:
   4. Drafts track draft/approved/posted/failed state and retain GitHub targeting metadata.
   5. User can edit custom review instructions and future AI reviews include them.
 
-**Plans**: 3 plans
+**Plans**: 5/5 plans executed
 
 Plans:
 
-- [ ] 04-01: Add findings/drafts repositories, models, and detail-page presentation
-- [ ] 04-02: Build draft edit and approval workflow
-- [ ] 04-03: Build custom instructions settings UI and service integration
+- [x] 04-01-PLAN.md
+- [x] 04-02-PLAN.md
+- [x] 04-03-PLAN.md
+- [x] 04-04-PLAN.md
+- [x] 04-05-PLAN.md
+
+**Wave 1**
+
+- [x] 04-01: Add draft persistence foundation and superseded-finding provenance
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 04-02: Add manual draft generation and split detail-page presentation
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [x] 04-03: Build draft edit/approve/unapprove workflow and retry stale marking
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [x] 04-04: Add global custom-instructions storage and management UI
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [x] 04-05: Integrate saved custom instructions into future AI execution and retries
 
 ### Phase 5: GitHub Comment Publishing
 
@@ -163,12 +185,25 @@ Plans:
   4. Failed publication shows a safe summarized error.
   5. The system never posts AI-generated comments without explicit user approval.
 
-**Plans**: 2 plans
+**Plans**: 3/3 plans complete
 
 Plans:
 
-- [ ] 05-01: Implement approved-draft publication service and GitHub client write path
-- [ ] 05-02: Add publish UI, per-draft status handling, and fake GitHub publication tests
+- [x] 05-01-PLAN.md
+- [x] 05-02-PLAN.md
+- [x] 05-03-PLAN.md
+
+**Wave 1**
+
+- [x] 05-01: Add GitHub publication client write path and safe failure mapping
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 05-02: Implement approved-draft publication service and per-draft persistence
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [x] 05-03: Add publish UI, per-draft status handling, and fake GitHub publication tests
 
 ## Future Direction
 
@@ -183,6 +218,32 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. Review Run Foundation and Management UI | 4/4 | Complete | 2026-06-27 |
 | 2. GitHub PR Ingestion | 3/3 | Complete    | 2026-06-27 |
-| 3. Queued AI Review and Structured Findings | 5/5 | Ready for verification | - |
-| 4. Draft Review and Custom Instructions | 0/3 | Not started | - |
-| 5. GitHub Comment Publishing | 0/2 | Not started | - |
+| 3. Queued AI Review and Structured Findings | 5/5 | Complete    | 2026-06-28 |
+| 4. Draft Review and Custom Instructions | 5/5 | Complete    | 2026-06-28 |
+| 5. GitHub Comment Publishing | 3/3 | Complete    | 2026-06-29 |
+| 6. OpenAI Codex OAuth AI Provider | 3/3 | Complete    | 2026-06-30 |
+
+### Phase 6: OpenAI Codex OAuth AI Provider
+
+**Goal:** Let queued AI review use an explicit Codex OAuth provider path backed by local Codex CLI auth cache without storing tokens or silently falling back to the API-key route.
+**Requirements**: [ARCH-01, ARCH-03, ARCH-05, AI-03, AI-04, AI-08, EXEC-04, EXEC-05]
+**Depends on:** Phase 5
+**Plans:** 3/3 plans complete
+
+Plans:
+
+- [x] 06-01-PLAN.md — Add explicit provider selection and a fakeable Codex auth-cache reader
+- [x] 06-02-PLAN.md — Add the Codex OAuth HTTP provider and categorized safe failure mapping
+- [x] 06-03-PLAN.md — Harden queued execution integration and run the full offline phase gate
+
+**Wave 1**
+
+- [x] 06-01: Add explicit provider selection and a fakeable Codex auth-cache reader
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 06-02: Add the Codex OAuth HTTP provider and categorized safe failure mapping
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [x] 06-03: Harden queued execution integration and run the full offline phase gate

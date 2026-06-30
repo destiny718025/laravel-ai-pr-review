@@ -28,12 +28,23 @@ return [
         'token' => env('GITHUB_TOKEN'),
     ],
 
+    'ai' => [
+        'provider' => env('AI_PROVIDER', 'fake'),
+    ],
+
     'openai' => [
-        'enabled' => env('OPENAI_ENABLED', false),
         'base_url' => env('OPENAI_BASE_URL', 'https://api.openai.com'),
         'api_key' => env('OPENAI_API_KEY'),
         'model' => env('OPENAI_MODEL', 'gpt-5.4-mini'),
         'timeout' => env('OPENAI_TIMEOUT', 30),
+    ],
+
+    'codex' => [
+        'auth_path' => env('CODEX_AUTH_PATH'),
+        'home' => env('CODEX_HOME'),
+        'fallback_home' => env('HOME'),
+        'base_url' => env('CODEX_BASE_URL', 'https://chatgpt.com/backend-api/codex'),
+        'timeout' => env('CODEX_TIMEOUT', 30),
     ],
 
     'ses' => [

@@ -49,6 +49,22 @@ class ReviewRun extends Model
     }
 
     /**
+     * @return HasMany<ReviewFinding, $this>
+     */
+    public function currentFindings(): HasMany
+    {
+        return $this->hasMany(ReviewFinding::class)->whereNull('superseded_at');
+    }
+
+    /**
+     * @return HasMany<ReviewCommentDraft, $this>
+     */
+    public function drafts(): HasMany
+    {
+        return $this->hasMany(ReviewCommentDraft::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

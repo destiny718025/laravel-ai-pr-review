@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Repositories\ReviewRunRepository;
 use App\Services\PullRequestIngestionService;
 use App\Services\ReviewExecutionDispatchService;
+use App\Services\ReviewInstructionSettingService;
 use App\Services\ReviewRunService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -40,10 +41,14 @@ class ReviewController extends Controller
             ->with('status', $result->message());
     }
 
-    public function show(int|string $reviewRun, ReviewRunRepository $reviewRunRepository): View
-    {
+    public function show(
+        int|string $reviewRun,
+        ReviewRunRepository $reviewRunRepository,
+        ReviewInstructionSettingService $reviewInstructionSettingService,
+    ): View {
         return view('reviews.show', [
             'reviewRun' => $reviewRunRepository->findWithPullRequestRepositoryOrFail($reviewRun),
+            'customReviewInstructions' => $reviewInstructionSettingService->currentGlobalInstructions(),
         ]);
     }
 

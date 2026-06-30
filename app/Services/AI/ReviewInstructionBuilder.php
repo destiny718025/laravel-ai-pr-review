@@ -17,4 +17,16 @@ class ReviewInstructionBuilder
             'Do not include comment draft state, approval state, or GitHub publication metadata.',
         ]);
     }
+
+    public function buildWithCustomInstructions(?string $customInstructions): string
+    {
+        $default = $this->buildDefault();
+        $customInstructions = $customInstructions === null ? null : trim($customInstructions);
+
+        if ($customInstructions === null || $customInstructions === '') {
+            return $default;
+        }
+
+        return $default."\n\nCustom Review Instructions:\n".$customInstructions;
+    }
 }

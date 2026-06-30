@@ -27,6 +27,21 @@ class ReviewFindingFactory extends Factory
             'title' => 'Example review finding',
             'rationale' => 'The code can fail under a realistic edge case.',
             'suggested_comment_text' => 'Please handle this edge case before merging.',
+            'superseded_at' => null,
         ];
+    }
+
+    public function current(): static
+    {
+        return $this->state(fn (): array => [
+            'superseded_at' => null,
+        ]);
+    }
+
+    public function superseded(?\DateTimeInterface $at = null): static
+    {
+        return $this->state(fn (): array => [
+            'superseded_at' => $at ?? now(),
+        ]);
     }
 }

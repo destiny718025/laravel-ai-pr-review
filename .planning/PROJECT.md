@@ -2,9 +2,9 @@
 
 ## What This Is
 
-Laravel AI PR Review is a personal-use Laravel web application for running AI-assisted code reviews on GitHub pull requests. The first version lets the user enter a GitHub PR URL in a management interface, fetch and analyze the PR diff, generate structured findings and GitHub-ready comment drafts, and manually approve comments before posting them back to GitHub.
+Laravel AI PR Review is a personal-use Laravel web application for running AI-assisted code reviews on GitHub pull requests. The v1 MVP lets the user enter a GitHub PR URL in a management interface, fetch and analyze the PR diff, generate structured findings and GitHub-ready comment drafts, manually approve comments, and publish approved comments back to GitHub with per-draft status tracking.
 
-The project is currently a fresh Laravel 13 skeleton with codebase mapping completed in `.planning/codebase/`. The product direction is to validate the AI review workflow first, then grow toward webhook automation, configurable rules, history, and team workflows.
+The project has completed the v1 manual review workflow. The next product direction is to validate the workflow in real use, then grow toward webhook automation, configurable rules, richer history, and team workflows.
 
 ## Core Value
 
@@ -18,21 +18,18 @@ Turn a GitHub PR URL into useful, reviewable AI findings and comment drafts that
 - Database-backed queue, cache, session, and default user infrastructure are scaffolded — existing
 - PHPUnit test setup is available — existing
 - Vite and Tailwind frontend tooling are available — existing
+- User can open a no-login management interface and submit GitHub PR URLs — Phase 1
+- System persists review runs, status/history, and safe failure summaries — Phase 1
+- System fetches GitHub PR metadata and changed-file snapshots through a fakeable GitHub client — Phase 2
+- System executes queued AI review through a provider interface and persists validated structured findings — Phase 3
+- System generates editable comment drafts, supports local approval, and stores custom review instructions — Phase 4
+- System publishes only approved drafts to GitHub and records posted/failed per-draft outcomes safely — Phase 5
 
 ### Active
 
-- [ ] User can open a web management interface without login for local/private personal use
-- [ ] User can submit a GitHub PR URL to start an AI review run
-- [ ] System can fetch or receive the PR diff data needed for review
-- [ ] System can persist review runs, findings, and comment drafts in the database
-- [ ] System can show a review history page with run status
-- [ ] User can open a review run detail page and inspect findings and comment drafts
-- [ ] System can generate review output focused first on bugs and security issues
-- [ ] System can also include Laravel/PHP style feedback when useful
-- [ ] User can edit simple custom review instructions in a textarea
-- [ ] AI provider access is isolated behind a provider interface rather than hardcoded into application flow
-- [ ] User can manually approve generated comment drafts before posting them to GitHub
-- [ ] System can post approved comments back to the relevant GitHub PR
+- [ ] Validate the manual v1 review workflow against real pull requests
+- [ ] Decide the next milestone scope: webhook automation, richer rule configuration, review history improvements, or team workflow
+- [ ] Revisit private repository token handling before expanding beyond personal/local use
 
 ### Out of Scope
 
@@ -56,7 +53,7 @@ The current repository is a new Laravel app at `/Users/tang/Project/laravel-ai-p
 - PHPUnit configured in `phpunit.xml`
 - Vite and Tailwind configured through `package.json` and `vite.config.js`
 
-The AI PR review product has not been implemented yet. There are no GitHub clients, AI provider clients, review models, review jobs, webhook routes, dashboard pages, or product-specific tests.
+The v1 manual AI PR review product is implemented. It includes GitHub ingestion, queued AI review execution, structured findings, editable/approved comment drafts, custom review instructions, and manual GitHub publication for approved drafts.
 
 Key workflow ideas discovered during initialization:
 
@@ -88,16 +85,17 @@ Key workflow ideas discovered during initialization:
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Build a Laravel web management interface for v1 | The user wants an interface to manage review runs, history, findings, and drafts | - Pending |
-| Skip login for first version | The first user is the project owner using a local/private app | - Pending |
-| Start with manual GitHub PR URL submission | Easier to validate the full review flow before webhook complexity | - Pending |
-| Store review runs, findings, and comment drafts | History and detail views are part of the management workflow | - Pending |
-| Generate comment drafts before posting | Keeps human control before writing to GitHub | - Pending |
-| Use simple custom instructions textarea for v1 rules | Enough configurability to validate rule usefulness without building a full rules engine | - Pending |
-| Use an AI provider interface | Keeps provider choice flexible and easier to test | - Pending |
-| Use Controller / Service / Repository architecture | Keeps HTTP handling, business workflows, and database access separated | - Pending |
-| Prioritize bug/security findings first | This is the highest-value AI review output for the MVP | - Pending |
-| Defer GitHub webhook automation | Webhook support depends on a stable manual review pipeline | - Pending |
+| Build a Laravel web management interface for v1 | The user wants an interface to manage review runs, history, findings, and drafts | Completed in Phases 1, 3, 4, and 5 |
+| Skip login for first version | The first user is the project owner using a local/private app | Completed in Phase 1 |
+| Start with manual GitHub PR URL submission | Easier to validate the full review flow before webhook complexity | Completed in Phase 1 |
+| Store review runs, findings, and comment drafts | History and detail views are part of the management workflow | Completed in Phases 1, 3, and 4 |
+| Generate comment drafts before posting | Keeps human control before writing to GitHub | Completed in Phase 4 |
+| Use simple custom instructions textarea for v1 rules | Enough configurability to validate rule usefulness without building a full rules engine | Completed in Phase 4 |
+| Use an AI provider interface | Keeps provider choice flexible and easier to test | Completed in Phase 3 |
+| Use Controller / Service / Repository architecture | Keeps HTTP handling, business workflows, and database access separated | Used across all v1 phases |
+| Prioritize bug/security findings first | This is the highest-value AI review output for the MVP | Completed in Phase 3 default instructions |
+| Defer GitHub webhook automation | Webhook support depends on a stable manual review pipeline | Still deferred after v1 |
+| Publish approved drafts only through explicit user action | Prevents accidental AI-generated comments on GitHub | Completed in Phase 5 |
 
 ## Evolution
 
@@ -117,4 +115,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-26 after initialization*
+*Last updated: 2026-06-29 after Phase 05 completion*

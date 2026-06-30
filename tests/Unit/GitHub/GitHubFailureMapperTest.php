@@ -3,10 +3,10 @@
 namespace Tests\Unit\GitHub;
 
 use App\Services\GitHub\GitHubFailureMapper;
+use GuzzleHttp\Psr7\Response as PsrResponse;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
-use GuzzleHttp\Psr7\Response as PsrResponse;
 use Tests\TestCase;
 
 class GitHubFailureMapperTest extends TestCase
@@ -51,6 +51,45 @@ class GitHubFailureMapperTest extends TestCase
 
         $this->assertSame('malformed_response', $failure->code);
         $this->assertSame('GitHub returned an unexpected response. Try again later.', $failure->message);
+    }
+
+    public function test_maps_publication_target_validation_to_safe_message(): void
+    {
+        $failure = app(GitHubFailureMapper::class)->mapPublication($this->requestException(422));
+
+        $this->assertSame('target_invalid', $failure->code);
+        $this->assertSame('GitHub could not apply this comment to the requested pull request location.', $failure->message);
+        $this->assertStringNotContainsString('raw upstream body', $failure->message);
+    }
+
+    public function test_maps_publication_authenticated_rejection_to_safe_message(): void
+    {
+        $failure = app(GitHubFailureMapper::class)->mapPublication($this->requestException(401, [
+            'Authorization' => 'Bearer secret-token',
+        ]));
+
+        $this->assertSame('auth_failed', $failure->code);
+        $this->assertSame('GitHub rejected the configured token. Check the token before publishing again.', $failure->message);
+        $this->assertStringNotContainsString('secret-token', $failure->message);
+    }
+
+    public function test_maps_publication_rate_limit_response_to_safe_message(): void
+    {
+        $failure = app(GitHubFailureMapper::class)->mapPublication($this->requestException(403, [
+            'X-RateLimit-Remaining' => '0',
+        ]));
+
+        $this->assertSame('rate_limited', $failure->code);
+        $this->assertSame('GitHub rate limit was reached. Try publishing comments again later.', $failure->message);
+    }
+
+    public function test_maps_publication_malformed_payload_to_safe_message(): void
+    {
+        $failure = app(GitHubFailureMapper::class)->mapPublication(new \UnexpectedValueException('html_url missing from raw payload'));
+
+        $this->assertSame('malformed_response', $failure->code);
+        $this->assertSame('GitHub returned an unexpected publication response. Try again later.', $failure->message);
+        $this->assertStringNotContainsString('html_url', $failure->message);
     }
 
     /**

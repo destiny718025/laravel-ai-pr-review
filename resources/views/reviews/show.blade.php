@@ -122,11 +122,11 @@
 
         <section class="section">
             <h2>Structured Findings</h2>
-            @if ($reviewRun->findings->isEmpty())
+            @if ($reviewRun->currentFindings->isEmpty())
                 <p class="muted">No AI review findings have been persisted for this run.</p>
             @else
                 <div class="metadata">
-                    @foreach ($reviewRun->findings as $finding)
+                    @foreach ($reviewRun->currentFindings as $finding)
                         <div class="metadata-row">
                             <span class="meta-label">{{ str($finding->severity)->title() }} {{ str($finding->category)->title() }}</span>
                             <span>
@@ -140,7 +140,128 @@
                 </div>
             @endif
         </section>
+
+        <section class="section">
+            @php
+                $hasApprovedDrafts = $reviewRun->drafts->contains(fn ($draft) => $draft->status->isApproved());
+                $hasFailedDrafts = $reviewRun->drafts->contains(fn ($draft) => $draft->status->isFailed());
+            @endphp
+            <div class="detail-header" style="margin-bottom: 16px;">
+                <h2>Comment Drafts</h2>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <form method="POST" action="{{ route('reviews.drafts.generate', $reviewRun) }}">
+                        @csrf
+                        <button type="submit">Generate Drafts</button>
+                    </form>
+
+                    @if ($hasApprovedDrafts)
+                        <form method="POST" action="{{ route('reviews.drafts.publish-approved', $reviewRun) }}">
+                            @csrf
+                            <button type="submit">Publish Approved</button>
+                        </form>
+                    @endif
+
+                    @if ($hasFailedDrafts)
+                        <form method="POST" action="{{ route('reviews.drafts.retry-failed', $reviewRun) }}">
+                            @csrf
+                            <button type="submit">Retry Failed</button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+
+            @if ($reviewRun->drafts->isEmpty())
+                <p class="muted">No comment drafts have been generated for this run.</p>
+            @else
+                <form id="approve-drafts-form" method="POST" action="{{ route('reviews.drafts.approve', $reviewRun) }}" style="margin-bottom: 16px;">
+                    @csrf
+                    <button type="submit">Approve Selected</button>
+                </form>
+
+                <div class="metadata">
+                    @foreach ($reviewRun->drafts as $draft)
+                        <div class="metadata-row">
+                            <span class="meta-label">
+                                {{ str($draft->status->value)->title() }}
+                                @if ($draft->stale_at)
+                                    <br>Stale Draft
+                                @endif
+                            </span>
+                            <span>
+                                <strong>{{ $draft->sourceFinding?->title ?: 'Source finding unavailable' }}</strong><br>
+                                {{ $draft->file_path }}@if ($draft->line_reference):{{ $draft->line_reference }}@endif<br>
+                                @if ($draft->stale_at)
+                                    <span class="muted">This draft is stale because the review run was retried after it was generated.</span><br>
+                                @endif
+
+                                @if ($draft->status->isDraft())
+                                    <label style="display: flex; gap: 8px; align-items: center; margin: 12px 0;">
+                                        <input type="checkbox" name="draft_ids[]" value="{{ $draft->id }}" form="approve-drafts-form">
+                                        Select for approval
+                                    </label>
+
+                                    <form method="POST" action="{{ route('reviews.drafts.update', [$reviewRun, $draft]) }}" style="display: grid; gap: 12px; margin: 12px 0;">
+                                        @csrf
+                                        @method('PATCH')
+                                        <label for="draft-body-{{ $draft->id }}">Comment draft text</label>
+                                        <textarea id="draft-body-{{ $draft->id }}" name="body" rows="5" style="width: 100%; border: 1px solid #D7DEE2; border-radius: 8px; padding: 12px; font: inherit;">{{ $draft->body }}</textarea>
+                                        <button type="submit" style="justify-self: start;">Save Draft</button>
+                                    </form>
+                                @else
+                                    {{ $draft->body }}<br>
+                                @endif
+
+                                @if ($draft->status->isApproved())
+                                    <form method="POST" action="{{ route('reviews.drafts.unapprove', [$reviewRun, $draft]) }}" style="margin: 12px 0;">
+                                        @csrf
+                                        <button type="submit">Cancel Approval</button>
+                                    </form>
+                                @endif
+
+                                @if ($draft->status->isPosted())
+                                    @if ($draft->posted_at)
+                                        Posted at: {{ $draft->posted_at->format('Y-m-d H:i') }}<br>
+                                    @endif
+
+                                    @if ($draft->github_comment_html_url)
+                                        GitHub comment:
+                                        <a href="{{ $draft->github_comment_html_url }}" target="_blank" rel="noreferrer">
+                                            {{ $draft->github_comment_html_url }}
+                                        </a><br>
+                                    @endif
+                                @endif
+
+                                @if ($draft->status->isFailed() && $draft->publication_error_message)
+                                    Last publish error: {{ $draft->publication_error_message }}<br>
+                                @endif
+
+                                Head SHA: {{ $draft->github_head_sha }}@if ($draft->source_file_sha)<br>File SHA: {{ $draft->source_file_sha }}@endif
+                            </span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </section>
     @endif
+
+    <section class="section">
+        <h2>Custom Review Instructions</h2>
+        <form method="POST" action="{{ route('review-instructions.update') }}" style="display: grid; gap: 12px;">
+            @csrf
+            @method('PUT')
+
+            <label for="custom-review-instructions">Instructions for future AI reviews</label>
+            <textarea id="custom-review-instructions" name="custom_instructions" rows="6" style="width: 100%; border: 1px solid #D7DEE2; border-radius: 8px; padding: 12px; font: inherit;">{{ old('custom_instructions', $customReviewInstructions) }}</textarea>
+
+            @error('custom_instructions', 'instructions')
+                <div class="error-block" style="margin-top: 0;">
+                    <strong>{{ $message }}</strong>
+                </div>
+            @enderror
+
+            <button type="submit" style="justify-self: start;">Save Instructions</button>
+        </form>
+    </section>
 
     <section class="section">
         <h2>Run Metadata</h2>
