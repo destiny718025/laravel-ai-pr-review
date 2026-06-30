@@ -1,58 +1,158 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel AI PR Review
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel AI PR Review 是一個個人使用的 Laravel Web 工具，用來對 GitHub Pull Request 執行 AI 輔助 code review。
 
-## About Laravel
+目前 v1.0 已完成一條手動審查流程：輸入 GitHub PR URL、抓取 PR metadata 與 changed files、透過佇列執行 AI review、產生結構化 findings 與可編輯的 comment drafts，最後由使用者手動核准後才發布到 GitHub。
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 核心價值
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+把一個 GitHub PR URL 轉換成可檢查、可編輯、可發布的 AI review findings 與 GitHub comment drafts，協助在 merge 前找出 bug、安全性問題與值得注意的程式碼風險。
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 目前功能
 
-## Learning Laravel
+- 無登入的本機管理介面，適合個人或私有環境使用。
+- 可從管理介面建立 review run。
+- 可解析 GitHub PR URL，並保存 owner、repository、PR number 與 source URL。
+- 可透過 GitHub API 取得 PR metadata 與 changed file snapshots。
+- changed files 會保存 `filename`、`patch`、`sha`，並在 review run 上保存 PR `head_sha`。
+- AI review 透過 Laravel queue 執行，不阻塞 HTTP request。
+- AI provider 使用 interface 抽象，測試可使用 fake provider。
+- AI findings 會經過 schema validation 後才保存。
+- findings 包含 severity、category、file path、line reference、title、rationale、suggested comment text。
+- 可從 findings 產生 comment drafts。
+- comment drafts 可編輯、核准、取消核准，並在 retry 後標記 stale。
+- 支援全域 custom review instructions，後續 AI review 會帶入最新設定。
+- 只發布已核准 drafts 到 GitHub。
+- 每個 draft 會追蹤 draft、approved、posted、failed 狀態。
+- GitHub 發布失敗會保存安全摘要，不保存 raw token、header 或 provider payload。
+- 支援 AI provider selector：`fake`、`openai_api_key`、`openai_codex_oauth`。
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 技術架構
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+專案採用 Laravel 13 與 PHP 8.3，v1.0 以 SQLite-first 的本機 MVP 為主。
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+主要架構規則：
 
-## Agentic Development
+- Controller 處理 HTTP request、validation、redirect、view response。
+- Service 處理業務流程，例如建立 review run、fetch PR、執行 AI review、發布 comments。
+- Repository 處理資料庫讀寫。
+- GitHub 與 AI provider 都藏在 interface 後面，方便測試 fake 與未來替換 provider。
+- 長時間工作使用 Laravel queue，避免在 HTTP request 中直接跑 AI 或外部 API 工作。
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+常見目錄：
 
-```bash
-composer require laravel/boost --dev
+- `app/Http/Controllers/`：Web controllers。
+- `app/Services/`：核心業務流程。
+- `app/Repositories/`：資料庫存取。
+- `app/Contracts/`：GitHub 與 AI interface。
+- `app/Data/`：DTO 與跨層資料物件。
+- `app/Enums/`：review run 與 draft 狀態。
+- `resources/views/reviews/`：管理介面 Blade views。
+- `tests/Feature/`、`tests/Unit/`：功能測試與單元測試。
 
-php artisan boost:install
+## AI Provider 設定
+
+透過 `.env` 的 `AI_PROVIDER` 選擇使用哪個 AI provider：
+
+```env
+AI_PROVIDER=fake
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+可用值：
 
-## Contributing
+- `fake`：預設值，使用固定假資料，適合本機開發與測試。
+- `openai_api_key`：使用 OpenAI API key 的 provider。
+- `openai_codex_oauth`：使用本機 Codex CLI auth cache 的 provider。
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+相關環境變數：
 
-## Code of Conduct
+```env
+GITHUB_TOKEN=
+OPENAI_API_KEY=
+CODEX_AUTH_PATH=
+CODEX_HOME=
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+安全注意事項：
 
-## Security Vulnerabilities
+- 不要把 GitHub token、OpenAI API key、Codex auth cache 內容 commit 進 repository。
+- 不要在 service 中直接使用 `env()`；應透過 Laravel config 讀取。
+- AI 與 GitHub 失敗訊息只保存安全摘要，不保存 raw response、authorization header 或 token。
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 安裝與啟動
+
+安裝依賴、建立 `.env`、產生 app key、執行 migration、安裝前端套件並 build assets：
+
+```bash
+composer run setup
+```
+
+啟動開發環境：
+
+```bash
+composer run dev
+```
+
+`composer run dev` 會同時啟動 Laravel server、queue listener、log viewer 與 Vite。
+
+## 測試
+
+一般測試指令：
+
+```bash
+composer run test
+```
+
+在目前這個工作環境中，PHP / Artisan / Composer 指令需要在容器內執行：
+
+```bash
+docker exec -w /var/www/laravel-ai-pr-review laradock-workspace-85-1 composer run test
+```
+
+最近一次完整回歸測試結果：
+
+```text
+119 passed, 853 assertions
+```
+
+## 使用流程
+
+1. 開啟管理介面。
+2. 輸入 GitHub PR URL 建立 review run。
+3. 在 review detail 頁面 fetch GitHub PR metadata 與 changed files。
+4. 點擊 Run AI Review，系統會派送 queued job。
+5. AI review 完成後查看 structured findings。
+6. 從 findings 產生 comment drafts。
+7. 編輯 drafts，核准想發布的 comments。
+8. 點擊 Publish Approved，把已核准 drafts 發布到 GitHub。
+9. 若發布失敗，可查看安全錯誤摘要並 retry failed drafts。
+
+## v1.0 狀態
+
+v1.0 manual review workflow 已完成：
+
+- 6 / 6 phases complete。
+- 23 / 23 plans complete。
+- GitHub PR ingestion、queued AI review、draft approval、GitHub publishing、Codex OAuth provider path 都已完成。
+
+更完整的里程碑摘要可查看：
+
+```text
+.planning/reports/MILESTONE_SUMMARY-v1.0.md
+```
+
+## 後續方向
+
+可能的下一階段：
+
+- 使用真實 public PR 驗證完整流程。
+- 支援 GitHub webhook trigger、signature validation 與 idempotency。
+- 加入登入、team workflow 與權限管理。
+- 擴充 named rule sets、repository-specific rules 與規則版本管理。
+- 改善 review history、搜尋與統計。
+- 強化 private repository token 管理。
+- 評估更多 AI provider 與 provider 管理介面。
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+此專案目前作為個人使用的 Laravel AI PR review MVP。若要公開或商用，請先補齊授權、資安與部署相關文件。
