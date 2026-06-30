@@ -60,6 +60,32 @@ class ValidatedFindingPayloadTest extends TestCase
         $this->assertSame([], $findings);
     }
 
+    public function test_validator_normalizes_common_ai_output_variants(): void
+    {
+        $findings = app(AIReviewPayloadValidator::class)->validate([
+            'findings' => [
+                [
+                    'severity' => ' Medium ',
+                    'category' => ' Bug ',
+                    'path' => 'app/Example.php',
+                    'line' => 42,
+                    'title' => ' Variant schema ',
+                    'reason' => ' Model used a common rationale alias. ',
+                    'comment' => ' Please handle common provider schema variants. ',
+                ],
+            ],
+        ]);
+
+        $this->assertCount(1, $findings);
+        $this->assertSame('medium', $findings[0]->severity);
+        $this->assertSame('bug', $findings[0]->category);
+        $this->assertSame('app/Example.php', $findings[0]->filePath);
+        $this->assertSame('42', $findings[0]->lineReference);
+        $this->assertSame('Variant schema', $findings[0]->title);
+        $this->assertSame('Model used a common rationale alias.', $findings[0]->rationale);
+        $this->assertSame('Please handle common provider schema variants.', $findings[0]->suggestedCommentText);
+    }
+
     public function test_validator_rejects_unknown_vocabulary_and_unexpected_structure(): void
     {
         $this->expectException(ValidationException::class);

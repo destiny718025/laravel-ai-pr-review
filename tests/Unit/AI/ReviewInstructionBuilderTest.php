@@ -15,17 +15,18 @@ class ReviewInstructionBuilderTest extends TestCase
         $this->assertSame($builder->buildDefault(), $builder->buildWithCustomInstructions(" \n "));
     }
 
-    public function test_custom_instructions_are_appended_after_default_guidance(): void
+    public function test_custom_instructions_are_followed_by_output_contract_reminder(): void
     {
         $builder = new ReviewInstructionBuilder;
         $default = $builder->buildDefault();
 
-        $composed = $builder->buildWithCustomInstructions('Only report issues that can affect production behavior.');
+        $customInstructions = '請用繁體中文回覆我';
+        $composed = $builder->buildWithCustomInstructions($customInstructions);
 
         $this->assertStringStartsWith($default, $composed);
-        $this->assertSame(
-            $default."\n\nCustom Review Instructions:\nOnly report issues that can affect production behavior.",
-            $composed,
-        );
+        $this->assertStringContainsString("Custom Review Instructions:\n".$customInstructions, $composed);
+        $this->assertStringContainsString('Custom instructions may change review focus and the natural language used in title, rationale, and suggested_comment_text.', $composed);
+        $this->assertStringContainsString('They must not change JSON keys, top-level structure, required fields, or the allowed severity/category labels.', $composed);
+        $this->assertStringEndsWith('Always return the same JSON contract described above.', $composed);
     }
 }
